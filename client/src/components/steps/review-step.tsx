@@ -1,8 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Check } from "lucide-react"
+import Image from "next/image"
 
 interface ReviewStepProps {
   formData: {
@@ -16,11 +15,6 @@ interface ReviewStepProps {
       primaryColor: string
       secondaryColor: string
       motto: string
-    }
-    teamInfo: {
-      league: string
-      division: string
-      rivals: string
     }
     logo: {
       template: string
@@ -36,119 +30,59 @@ interface ReviewStepProps {
 
 export function ReviewStep({ formData, onBack, onSubmit }: ReviewStepProps) {
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Check className="h-5 w-5 mr-2 text-green-500" />
-              Basic Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <dl className="space-y-2">
-              <div className="flex justify-between">
-                <dt className="font-medium">Club Name:</dt>
-                <dd>{formData.basicInfo.name}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="font-medium">Location:</dt>
-                <dd>{formData.basicInfo.location}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="font-medium">Founded:</dt>
-                <dd>{formData.basicInfo.foundingYear}</dd>
-              </div>
-            </dl>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Check className="h-5 w-5 mr-2 text-green-500" />
-              Club Details
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <dl className="space-y-2">
-              <div className="flex justify-between">
-                <dt className="font-medium">Stadium:</dt>
-                <dd>{formData.clubDetails.stadium}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="font-medium">Colors:</dt>
-                <dd className="flex items-center">
-                  <div
-                    className="w-4 h-4 rounded-full mr-1"
-                    style={{ backgroundColor: formData.clubDetails.primaryColor }}
-                  ></div>
-                  <div
-                    className="w-4 h-4 rounded-full"
-                    style={{ backgroundColor: formData.clubDetails.secondaryColor }}
-                  ></div>
-                </dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="font-medium">Motto:</dt>
-                <dd>{formData.clubDetails.motto || "None"}</dd>
-              </div>
-            </dl>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Check className="h-5 w-5 mr-2 text-green-500" />
-              Team Information
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <dl className="space-y-2">
-              <div className="flex justify-between">
-                <dt className="font-medium">League:</dt>
-                <dd>{formData.teamInfo.league}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="font-medium">Division:</dt>
-                <dd>{formData.teamInfo.division}</dd>
-              </div>
-              <div className="flex justify-between">
-                <dt className="font-medium">Rivals:</dt>
-                <dd>{formData.teamInfo.rivals || "None"}</dd>
-              </div>
-            </dl>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Check className="h-5 w-5 mr-2 text-green-500" />
-              Club Logo
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="flex justify-center">
-            <canvas id="review-logo" width={150} height={150} className="border rounded-lg"></canvas>
-          </CardContent>
-        </Card>
+    <div className="max-w-xs mx-auto">
+      <div className="mt-6 bg-gray-800 rounded-xl shadow-2xl w-full p-4 flex flex-col items-center">
+      {/* NFT Logo inside the card */}
+      <div className="mb-4 bg-gray-900 rounded-sm shadow-lg p-1 flex justify-center items-center">
+        <Image
+        width={80}
+        height={80}
+        src={formData.logo.emblem}
+        alt="Club Logo"
+        className="w-20 h-20 object-contain"
+        />
+      </div>
+      {/* Card Content */}
+      <div className="w-full text-center">
+        <h2 className="text-lg font-bold mb-1 text-white truncate">{formData.basicInfo.name}</h2>
+        <p className="text-xs text-cyan-400 mb-2">{formData.basicInfo.location} • {formData.basicInfo.foundingYear}</p>
+        <div className="flex justify-center items-center gap-1 mb-2">
+        <span
+          className="w-4 h-4 rounded-full border border-cyan-700"
+          style={{ backgroundColor: formData.clubDetails.primaryColor }}
+          title="Primary Color"
+        ></span>
+        <span
+          className="w-4 h-4 rounded-full border border-cyan-700"
+          style={{ backgroundColor: formData.clubDetails.secondaryColor }}
+          title="Secondary Color"
+        ></span>
+        </div>
+        <div className="mb-2">
+        <span className="inline-block bg-gray-800 text-cyan-200 px-2 py-0.5 rounded text-xs font-medium">
+          {formData.clubDetails.stadium}
+        </span>
+        </div>
+        <div className="mb-2">
+        <span className="italic text-gray-400 text-xs">&quot;{formData.clubDetails.motto || "No motto"}&quot;</span>
+        </div>
+      </div>
       </div>
 
-      <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <h3 className="text-lg font-medium text-green-800 mb-2">Ready to Create Your Club!</h3>
-        <p className="text-green-700">
-          You've completed all the steps to create your club. Review the information above and click "Create Club" to
-          finalize.
-        </p>
-      </div>
-
-      <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onBack}>
-          Back
+      <div className="pt-4 flex justify-between items-center gap-4">
+        <Button
+        type="button"
+        variant="outline"
+        onClick={onBack}
+        className="px-4 py-2 border-gray-700 text-gray-800 hover:bg-gray-800 hover:text-gray-200 rounded-none"
+        >
+        Back
         </Button>
-        <Button onClick={onSubmit} className="bg-green-600 hover:bg-green-700">
-          Create Club
+        <Button
+        type="submit"
+        className="flex-1 h-10 bg-gradient-to-r from-cyan-600 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-none font-medium text-white shadow-md transition-all"
+        >
+        Create Club & Mint NFT
         </Button>
       </div>
     </div>

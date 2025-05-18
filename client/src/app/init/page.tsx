@@ -4,7 +4,6 @@ import { useState } from "react"
 import { ClubCreationStepper } from "@/components/club-creation-stepper"
 import { BasicInfoStep } from "@/components/steps/basic-info-step"
 import { ClubDetailsStep } from "@/components/steps/club-details-step"
-import { TeamInfoStep } from "@/components/steps/team-info-step"
 import { LogoCustomizerStep } from "@/components/steps/logo-customizer-step"
 import { ReviewStep } from "@/components/steps/review-step"
 
@@ -13,19 +12,13 @@ export default function ClubCreator() {
   const [formData, setFormData] = useState({
     basicInfo: {
       name: "",
-      location: "",
-      foundingYear: new Date().getFullYear(),
+      location: ""
     },
     clubDetails: {
       stadium: "",
       primaryColor: "#ff0000",
       secondaryColor: "#ffffff",
       motto: "",
-    },
-    teamInfo: {
-      league: "",
-      division: "",
-      rivals: "",
     },
     logo: {
       template: "shield",
@@ -61,18 +54,6 @@ export default function ClubCreator() {
       ),
     },
     {
-      id: "team-info",
-      name: "Team Information",
-      component: (
-        <TeamInfoStep
-          data={formData.teamInfo}
-          updateData={(data) => setFormData({ ...formData, teamInfo: data })}
-          onNext={() => setCurrentStep(3)}
-          onBack={() => setCurrentStep(1)}
-        />
-      ),
-    },
-    {
       id: "logo-customizer",
       name: "Logo Customizer",
       component: (
@@ -82,8 +63,8 @@ export default function ClubCreator() {
           primaryColor={formData.clubDetails.primaryColor}
           secondaryColor={formData.clubDetails.secondaryColor}
           updateData={(data) => setFormData({ ...formData, logo: data })}
-          onNext={() => setCurrentStep(4)}
-          onBack={() => setCurrentStep(2)}
+          onNext={() => setCurrentStep(3)}
+          onBack={() => setCurrentStep(1)}
         />
       ),
     },
@@ -93,7 +74,7 @@ export default function ClubCreator() {
       component: (
         <ReviewStep
           formData={formData}
-          onBack={() => setCurrentStep(3)}
+          onBack={() => setCurrentStep(2)}
           onSubmit={() => alert("Club created successfully!")}
         />
       ),
@@ -101,36 +82,36 @@ export default function ClubCreator() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50">
-      <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-950">
+      <div className="flex flex-col mx-auto py-8 px-4 sm:px-6">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 mb-2">
+          <h1 className="text-4xl font-extrabold text-white mb-2">
             Create Your Club
           </h1>
-          <p className="text-gray-600 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
             Build your dream sports club with our intuitive step-by-step process
           </p>
         </div>
         
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="border-b border-gray-100 px-6 py-4">
+        <div className="bg-gray-900 border border-gray-800 rounded-none p-6 shadow-lg w-6xl mx-auto justify-center">
+          <div className="border-b border-gray-800 px-4 py-2">
             <ClubCreationStepper steps={steps} currentStep={currentStep} />
           </div>
           
           <div className="p-6 sm:p-8">
-            <div className="mt-2 transition-all duration-300 ease-in-out">
+            <div className="mt-1 transition-all duration-300 ease-in-out">
               {steps[currentStep].component}
             </div>
           </div>
           
-          <div className="bg-gray-50 px-6 py-4 flex justify-between items-center text-sm text-gray-500">
+          <div className="px-6 py-1 flex justify-between items-center text-sm text-gray-300">
             <div>Step {currentStep + 1} of {steps.length}</div>
             <div>{Math.round((currentStep + 1) / steps.length * 100)}% complete</div>
           </div>
         </div>
         
-        <div className="mt-8 text-center text-sm text-gray-500">
-          Need help? <button className="text-blue-600 hover:text-blue-800 font-medium">Contact support</button>
+        <div className="mt-4 text-center text-sm text-gray-500">
+          <p>Powered by Sui | OnChainFC</p>
         </div>
       </div>
     </div>
