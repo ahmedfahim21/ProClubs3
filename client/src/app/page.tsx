@@ -41,7 +41,7 @@ export default function Home() {
                 <h3 className="text-xl font-bold text-white mb-2">Ready to Play!</h3>
                 <p className="text-gray-400 mb-4">Your wallet is connected successfully!</p>
                 <Link href="/init" className="flex items-center justify-center">
-                  <button className="bg-blue-600 text-white py-3 px-6 rounded-none hover:bg-blue-700 transition-all">
+                  <button className="bg-cyan-600 text-white py-3 px-6 rounded-none hover:bg-cyan-700 transition-all">
                     Start Your Career
                   </button>
                 </Link>

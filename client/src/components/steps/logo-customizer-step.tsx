@@ -30,25 +30,39 @@ export function LogoCustomizerStep({
   onBack,
 }: LogoCustomizerStepProps) {
   const [prompt, setPrompt] = useState("")
-  const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [imageUrl, setImageUrl] = useState<string | null>(data.emblem || null)
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
-  // Dummy AI image generation handler (replace with real API call)
   const handleGenerate = async () => {
     setLoading(true)
-    // Simulate API call
-    setTimeout(() => {
-      setImageUrl("/OnChainFC.png") // Replace with actual image URL from API
+    try {
+      const response = await fetch('/api/image-gen', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: "Generate a simple logo for a football club with the following colors: " + primaryColor + " as primary and " + secondaryColor + " as secondary. Additionally consider " + prompt,
+        }),
+      })
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate logo')
+      }
+      
+      const data = await response.json()
+      setImageUrl(data.imageUrl)
+    } catch (error) {
+      console.error('Error generating logo:', error)
+      setErrors({ ...errors, generation: "Failed to generate logo. Please try again." })
+    } finally {
       setLoading(false)
-    }, 1500)
+    }
   }
 
   const validate = () => {
     const newErrors: Record<string, string> = {}
-    if (!prompt.trim()) {
-      newErrors.prompt = "Logo description is required"
-    }
     if (!imageUrl) {
       newErrors.imageUrl = "Logo image is required"
     }

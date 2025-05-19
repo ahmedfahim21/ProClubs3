@@ -12,7 +12,6 @@ interface ClubDetailsData {
   stadium: string
   primaryColor: string
   secondaryColor: string
-  motto: string
 }
 
 interface ClubDetailsStepProps {
@@ -144,23 +143,6 @@ export function ClubDetailsStep({ data, updateData, onNext, onBack }: ClubDetail
           </div>
         </div>
         </div>
-      </div>
-
-      <div className={`transition-all duration-200 ${focused === 'motto' ? 'scale-[1.02]' : ''}`}>
-        <div className="flex items-center space-x-3 mb-2">
-        <Quote className="h-5 w-5 text-cyan-500" />
-        <Label htmlFor="motto" className="text-base font-medium text-gray-200">Club Motto</Label>
-        </div>
-        <Textarea
-        id="motto"
-        placeholder="Club motto"
-        value={data.motto}
-        onChange={(e) => updateData({ ...data, motto: e.target.value })}
-        className="pl-3 pt-2 bg-gray-900 border border-gray-700 focus:border-blue-500 text-white rounded-none transition-all"
-        rows={2}
-        onFocus={() => setFocused('motto')}
-        onBlur={() => setFocused(null)}
-        />
       </div>
 
       <div className="pt-4 flex justify-between items-center gap-4">

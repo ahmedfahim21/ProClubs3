@@ -93,15 +93,12 @@ export default function AppSidebar() {
           {menuItems.map((item, index) => {
             const isActive = pathname === item.href;
             return (
-              <Link href={item.href} key={index} legacyBehavior>
-                <a
-                  className={cn(
+              <Link href={item.href} key={index} className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer transition-all font-light",
                     isActive
                       ? "bg-cyan-600 shadow-md"
                       : "hover:bg-cyan-600/50 text-cyan-100"
-                  )}
-                >
+                  )}>
                   <div
                     className={cn(
                       "flex items-center justify-center",
@@ -120,7 +117,6 @@ export default function AppSidebar() {
                       {item.label}
                     </span>
                   )}
-                </a>
               </Link>
             );
           })}
