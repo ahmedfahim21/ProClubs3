@@ -64,15 +64,15 @@ export default function AppSidebar() {
         {!collapsed && (
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full flex items-center justify-center">
-              <Image src="/OnChainFC.png" alt="Logo" className="w-8 h-8" width={24} height={24} />
+              <Image src="/ProClubs3.png" alt="Logo" className="w-8 h-8" width={24} height={24} />
             </div>
-            <span className="font-bold text-lg tracking-tight">OnChainFC</span>
+            <span className="font-bold text-lg tracking-tight">ProClubs3</span>
           </div>
         )}
         {collapsed && (
           <div className="mx-auto">
             <div className="w-8 h-8 rounded-full flex items-center justify-center">
-              <Image src="/OnChainFC.png" alt="Logo" className="w-6 h-6" width={24} height={24} />
+              <Image src="/ProClubs3.png" alt="Logo" className="w-6 h-6" width={24} height={24} />
             </div>
           </div>
         )}
@@ -125,7 +125,7 @@ export default function AppSidebar() {
         {!collapsed && (
           <div className="px-4 py-2 text-xs text-cyan-300 text-center">
             <hr className="border-t border-cyan-600 m-1" />
-            © 2025 OnChainFC
+            © 2025 ProClubs3
             </div>
         )}
       </div>

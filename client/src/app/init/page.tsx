@@ -180,7 +180,7 @@ export default function ClubCreator() {
         </div>
 
         <div className="mt-4 text-center text-sm text-gray-500">
-          <p>Powered by Sui | OnChainFC</p>
+          <p>Powered by Sui | ProClubs3</p>
         </div>
       </div>
     </div>

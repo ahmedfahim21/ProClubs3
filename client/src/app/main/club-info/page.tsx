@@ -10,7 +10,7 @@ export default function ClubInfoPage() {
       {/* Club Overview */}
       <div className="flex flex-col md:flex-row items-center gap-8">
         <Image
-          src="/OnChainFC.png"
+          src="/ProClubs3.png"
           alt="Club Logo"
           width={120}
           height={120}

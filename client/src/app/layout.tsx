@@ -3,7 +3,7 @@ import "./globals.css";
 import WalletContextProvider from "../providers/walletcontextprovider";
 
 export const metadata: Metadata = {
-  title: "OnchainFC"
+  title: "ProClubs3"
 };
 
 export default function RootLayout({
