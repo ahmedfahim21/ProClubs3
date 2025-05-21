@@ -104,3 +104,176 @@ export const POSITIONS = {
     "MID": 0.4,  // 40% chance for midfielder
     "FWD": 0.2   // 20% chance for forward
 };
+
+
+export const FORMATIONS = {
+  "4-2-3-1 Wide": {
+    positions: [
+      { x: "center", y: "bottom", role: "GK", duty: "De" },
+      { x: "left", y: "defense", role: "FB", duty: "Su" },
+      { x: "center-left", y: "defense", role: "BPD", duty: "De" },
+      { x: "center-right", y: "defense", role: "BPD", duty: "De" },
+      { x: "right", y: "defense", role: "FB", duty: "Su" },
+      { x: "center-left", y: "def-mid", role: "DLP", duty: "Su" },
+      { x: "center-right", y: "def-mid", role: "BBM", duty: "Su" },
+      { x: "left", y: "attack-mid", role: "IF", duty: "At" },
+      { x: "center", y: "attack-mid", role: "AM", duty: "Su" },
+      { x: "right", y: "attack-mid", role: "IW", duty: "Su" },
+      { x: "center", y: "top", role: "DLF", duty: "Su" },
+    ]
+  },
+  "4-3-3 Attacking": {
+    positions: [
+      { x: "center", y: "bottom", role: "GK", duty: "De" },
+      { x: "left", y: "defense", role: "WB", duty: "At" },
+      { x: "center-left", y: "defense", role: "CD", duty: "De" },
+      { x: "center-right", y: "defense", role: "CD", duty: "De" },
+      { x: "right", y: "defense", role: "WB", duty: "At" },
+      { x: "center", y: "def-mid", role: "DM", duty: "De" },
+      { x: "center-left", y: "midfield", role: "MEZ", duty: "At" },
+      { x: "center-right", y: "midfield", role: "CAR", duty: "Su" },
+      { x: "left", y: "attack", role: "IF", duty: "At" },
+      { x: "right", y: "attack", role: "IF", duty: "At" },
+      { x: "center", y: "top", role: "CF", duty: "At" },
+    ]
+  },
+  "5-3-2 Counter": {
+    positions: [
+      { x: "center", y: "bottom", role: "GK", duty: "De" },
+      { x: "left", y: "defense", role: "WB", duty: "Su" },
+      { x: "left-center", y: "defense", role: "BPD", duty: "Co" },
+      { x: "center", y: "defense", role: "CD", duty: "De" },
+      { x: "right-center", y: "defense", role: "BPD", duty: "Co" },
+      { x: "right", y: "defense", role: "WB", duty: "Su" },
+      { x: "left", y: "midfield", role: "BWM", duty: "Su" },
+      { x: "center", y: "midfield", role: "DLP", duty: "De" },
+      { x: "right", y: "midfield", role: "BBM", duty: "Su" },
+      { x: "center-left", y: "top", role: "DLF", duty: "Su" },
+      { x: "center-right", y: "top", role: "AF", duty: "At" },
+    ]
+  },
+  "4-4-2 Diamond": {
+    positions: [
+      { x: "center", y: "bottom", role: "GK", duty: "De" },
+      { x: "left", y: "defense", role: "FB", duty: "De" },
+      { x: "center-left", y: "defense", role: "CD", duty: "De" },
+      { x: "center-right", y: "defense", role: "CD", duty: "De" },
+      { x: "right", y: "defense", role: "FB", duty: "De" },
+      { x: "center", y: "def-mid", role: "DM", duty: "De" },
+      { x: "left", y: "midfield", role: "CM", duty: "Su" },
+      { x: "right", y: "midfield", role: "CM", duty: "Su" },
+      { x: "center", y: "attack-mid", role: "AP", duty: "Su" },
+      { x: "center-left", y: "top", role: "DLF", duty: "Su" },
+      { x: "center-right", y: "top", role: "AF", duty: "At" },
+    ]
+  }
+};
+
+export const PLAYING_STYLES = {
+  "Gegenpress": {
+    mentality: "Positive",
+    possession: [
+      "Pass forward quickly",
+      "Build from the back",
+      "Very fast tempo",
+      "Keep players narrow"
+    ],
+    transition: [
+      "Quick counter",
+      "Win ball back immediately",
+      "Short goal kicks",
+      "Pass to centre-backs"
+    ],
+    defense: [
+      "High defensive line",
+      "Press high up",
+      "Press constantly",
+      "Stop short goal kicks"
+    ]
+  },
+  "Tiki-Taka": {
+    mentality: "Balanced",
+    possession: [
+      "Short passes",
+      "Build from the back",
+      "Slow tempo",
+      "Work ball into the box"
+    ],
+    transition: [
+      "Pass to centre-backs",
+      "Fall back when losing ball",
+      "Keep team shape",
+      "Short goal kicks"
+    ],
+    defense: [
+      "High defensive line",
+      "Press higher",
+      "Active pressing",
+      "Stop short goal kicks"
+    ]
+  },
+  "Counter-Attack": {
+    mentality: "Cautious",
+    possession: [
+      "Play into space",
+      "Direct passes",
+      "Quick tempo",
+      "Allow creativity"
+    ],
+    transition: [
+      "Break forward fast",
+      "Distribute quickly",
+      "Roll ball out",
+      "Fall back when losing ball"
+    ],
+    defense: [
+      "Deeper defensive line",
+      "Drop deeper to defend",
+      "Low pressing",
+      "Use offside trap"
+    ]
+  },
+  "Park the Bus": {
+    mentality: "Defensive",
+    possession: [
+      "Clear the ball long",
+      "Play slow",
+      "Early crosses",
+      "Use wings"
+    ],
+    transition: [
+      "Quick clearances",
+      "Fall back when losing ball",
+      "Target the striker",
+      "Kick it long"
+    ],
+    defense: [
+      "Very deep line",
+      "Defend deep",
+      "Minimal pressing",
+      "Stay on feet"
+    ]
+  }
+};
+
+
+export const PLAYERS = [
+  { number: "24", name: "André Onana", position: "GK", stars: 4 },
+  { number: "12", name: "N. Mazraoui", position: "DR", rstars: 3 },
+  { number: "5", name: "Daley Blind", position: "DCR", rstars: 3 },
+  { number: "17", name: "Joël Veltman", position: "DCL", rstars: 3 },
+  { number: "3", name: "N. Tagliafico", position: "DL", stars: 4 },
+  { number: "6", name: "D. van de Beek", position: "MCR", rstars: 4 },
+  { number: "8", name: "Edson Álvarez", position: "MCL", rstars: 3 },
+  { number: "20", name: "R. Gravenberch", position: "AMC", stars: 2 },
+  { number: "7", name: "David Neres", position: "AMR", stars: 3 },
+  { number: "22", name: "Hakim Ziyech", position: "AMC", stars: 4 },
+  { number: "11", name: "Q. Promes", position: "AML", stars: 4 },
+  { number: "10", name: "Dusan Tadic", position: "STC", rstars: 4 },
+  { number: "15", name: "Sergiño Dest", position: "DR", stars: 3 },
+  { number: "4", name: "Perr Schuurs", position: "DC", stars: 3 },
+  { number: "23", name: "Z. Labyad", position: "AMC", stars: 2 },
+  { number: "21", name: "Lisandro Martinez", position: "DM", stars: 3 },
+  { number: "9", name: "K. Huntelaar", position: "ST", stars: 3 },
+  { number: "1", name: "B. Varela", position: "GK", stars: 2 },
+];

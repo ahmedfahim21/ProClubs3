@@ -1,5 +1,5 @@
 [package]
-name = "onchainfc"
+name = "proclubs3"
 edition = "2024.beta" # edition = "legacy" to use legacy (pre-2024) Move
 license = "Apache 2.0"
 authors = ["Fahim Ahmed (ahmed.fahim0207@gmail.com)"]      
@@ -8,7 +8,7 @@ authors = ["Fahim Ahmed (ahmed.fahim0207@gmail.com)"]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "testnet" }
 
 [addresses]
-onchainfc = "0x0"
+proclubs3 = "0x0"
 sui =  "0000000000000000000000000000000000000000000000000000000000000002"
 
 [dev-dependencies]

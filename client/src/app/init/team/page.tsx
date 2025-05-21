@@ -1,12 +1,17 @@
 "use client";
 
-import { CalendarIcon, FlagIcon, LoaderCircle } from 'lucide-react';
+import { CalendarIcon, Droplet, FlagIcon, LoaderCircle } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
-import { NATIONALITIES, POSITIONS } from '@/utils/constants';
+import { NATIONALITIES } from '@/utils/constants';
+import { generateImagePrompt, generatePlayer } from '@/utils/player-gen';
+import { useWallet } from '@suiet/wallet-kit';
+import { redirect } from 'next/navigation';
+import { storeBlob } from '@/utils/blob';
+import { Transaction } from '@mysten/sui/transactions';
+import { Button } from '@/components/ui/button';
 
-interface Player {
-    id: string;
+export interface Player {
     firstName?: string;
     lastName?: string;
     name: string;
@@ -24,112 +29,9 @@ interface Player {
     imageUrl: string | null;
 }
 
-
-const generatePlayer = (nationality: keyof typeof NATIONALITIES) => {
-
-    const countryData = NATIONALITIES[nationality] || NATIONALITIES["England"];
-    const firstName = countryData.firstNames[Math.floor(Math.random() * countryData.firstNames.length)];
-    const lastName = countryData.names[Math.floor(Math.random() * countryData.names.length)];
-
-    const positionRoll = Math.random();
-    let position: string = "MID";
-    let cumulativeProbability = 0;
-
-    for (const [pos, probability] of Object.entries(POSITIONS)) {
-        cumulativeProbability += probability;
-        if (positionRoll <= cumulativeProbability) {
-            position = pos;
-            break;
-        }
-    }
-
-    const baseAttributes = {
-        physical: Math.floor(Math.random() * 40) + 60,
-        speed: Math.floor(Math.random() * 40) + 60,
-        shooting: Math.floor(Math.random() * 40) + 60,
-        passing: Math.floor(Math.random() * 40) + 60,
-        dribbling: Math.floor(Math.random() * 40) + 60,
-        defending: Math.floor(Math.random() * 40) + 60
-    };
-
-    const attributes = { ...baseAttributes };
-
-    switch (position) {
-        case "GK":
-            attributes.physical = Math.min(99, attributes.physical + 10);
-            attributes.defending = Math.min(99, attributes.defending + 15);
-            attributes.shooting = Math.max(60, attributes.shooting - 15);
-            attributes.dribbling = Math.max(60, attributes.dribbling - 10);
-            break;
-        case "DEF":
-            attributes.physical = Math.min(99, attributes.physical + 10);
-            attributes.defending = Math.min(99, attributes.defending + 15);
-            attributes.shooting = Math.max(60, attributes.shooting - 5);
-            break;
-        case "MID":
-            attributes.passing = Math.min(99, attributes.passing + 10);
-            attributes.dribbling = Math.min(99, attributes.dribbling + 5);
-            break;
-        case "FWD":
-            attributes.shooting = Math.min(99, attributes.shooting + 15);
-            attributes.speed = Math.min(99, attributes.speed + 10);
-            attributes.dribbling = Math.min(99, attributes.dribbling + 5);
-            attributes.defending = Math.max(60, attributes.defending - 10);
-            break;
-    }
-
-    const age = Math.floor(Math.random() * 21) + 17;
-
-    return {
-        id: Math.random().toString(36).substring(2, 9),
-        firstName,
-        lastName,
-        name: `${firstName} ${lastName}`,
-        nationality,
-        position,
-        age,
-        attributes,
-        imageUrl: null // Will be populated later
-    };
-};
-
-const generateImagePrompt = (player: Player) => {
-    const { name, nationality, position, age } = player;
-
-    const positionElements: Record<string, string> = {
-        "GK": "goalkeeper gloves, goalkeeper jersey",
-        "DEF": "defender stance, focused expression",
-        "MID": "midfielder pose, alert expression",
-        "FWD": "forward stance, confident expression"
-    };
-    const positionElement = positionElements[position as keyof typeof positionElements] || "";
-
-    let ageDescription = "";
-    if (age < 22) {
-        ageDescription = "young, fresh face";
-    } else if (age > 30) {
-        ageDescription = "experienced, mature features";
-    } else {
-        ageDescription = "in prime condition";
-    }
-    const enhancedPrompt = `
-        Generate a professional football player headshot with the following specifications:
-        - Portrait of a ${nationality} football player, ${ageDescription}, ${position} position, ${positionElement}.
-        - Consistent portrait style: head and shoulders view
-        - Solid color background (preferably white or gray)
-        - Uniform lighting across all images
-        - Cartoonish digital art style
-        - Professional team jersey (generic, no specific team logo)
-        - No text or watermarks
-        - Aspect ratio: square
-        `;
-    return enhancedPrompt;
-};
-
 const PlayerCard = ({ player }: { player: Player }) => {
     const { name, nationality, position, age, attributes, imageUrl } = player;
 
-    // Function to get color based on attribute value
     const getAttributeColor = (value: number) => {
         if (value >= 90) return "bg-green-500/40";
         if (value >= 80) return "bg-green-300/40";
@@ -140,7 +42,6 @@ const PlayerCard = ({ player }: { player: Player }) => {
 
     return (
         <div className="bg-gray-800 shadow-lg overflow-hidden transition-shadow duration-300">
-            {/* Square image container with fixed aspect ratio */}
             <div className="relative aspect-square overflow-hidden">
                 {imageUrl ? (
                     <Image
@@ -163,7 +64,7 @@ const PlayerCard = ({ player }: { player: Player }) => {
                 {/* Header with name and position */}
                 <div className="flex justify-between items-center mb-3">
                     <h3 className="font-bold text-lg text-gray-200">{name}</h3>
-                    <span className="px-3 py-1 bg-cyan-600 text-white text-xs rounded-full font-medium">{position}</span>
+                    <span className="p-1 bg-cyan-600 text-white text-xs rounded-full font-medium">{position}</span>
                 </div>
 
                 {/* Player info */}
@@ -212,9 +113,9 @@ export default function FootballPlayerGenerator() {
             const newPlayers = [];
 
             const targetPositions = {
-                "GK": 2,  // 2 goalkeepers
-                "DEF": 5, // 5 defenders
-                "MID": 6, // 6 midfielders
+                "GK": 0,  // 2 goalkeepers
+                "DEF": 0, // 5 defenders
+                "MID": 0, // 6 midfielders
                 "FWD": 3  // 3 forwards
             };
 
@@ -275,34 +176,109 @@ export default function FootballPlayerGenerator() {
         }
     };
 
-    return (
-        <div className="mx-auto p-4 bg-gray-900">
-            <div className='max-w-6xl mx-auto'>
-                <h1 className="text-3xl font-bold text-center my-6 text-gray-200">Football Player Generator</h1>
+    const { connected, account, address, signAndExecuteTransaction } = useWallet();
+    const [isMinting, setIsMinting] = useState<"not-minting" | "minting" | "minted">("not-minting");
 
-                <div className="flex justify-center mb-8">
-                    <button
-                        onClick={generateTeam}
-                        disabled={isGenerating}
-                        className="bg-cyan-600 text-white py-3 px-6 font-bold text-lg hover:bg-cyan-700 disabled:bg-gray-400"
-                    >
-                        {isGenerating ? 'Generating Team...' : 'Generate Random Team'}
-                    </button>
-                </div>
+    const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x1";
+
+    const handleMintPlayers = async () => {
+        if (!connected) {
+            alert('Please connect your Sui wallet first');
+            return;
+        }
+
+        try {
+            setIsMinting("minting");
+
+            // First, store all images and collect the blob IDs
+            const playersWithBlobs = await Promise.all(
+                // @ts-expect-error handled
+                players.map(async (player) => {
+                    const imageInfo = await storeBlob(player.imageUrl, 5, connected, address);
+                    return {
+                        ...player,
+                        blobId: imageInfo.blobId
+                    };
+                })
+            );
+
+            // Create a single transaction block for all players
+            const tx = new Transaction();
+
+            // Add each player creation to the transaction block
+            playersWithBlobs.forEach(player => {
+                tx.moveCall({
+                    target: `${PACKAGE_ID}::player::create_player`,
+                    arguments: [
+                        tx.pure.string(player.name),
+                        tx.pure.string(player.nationality),
+                        tx.pure.string(player.position),
+                        tx.pure.u8(player.attributes.speed),
+                        tx.pure.u8(player.attributes.shooting),
+                        tx.pure.u8(player.attributes.passing),
+                        tx.pure.u8(player.attributes.dribbling),
+                        tx.pure.u8(player.attributes.defending),
+                        tx.pure.u8(player.attributes.physical),
+                        tx.pure.u8(player.age),
+                        tx.pure.string(player.blobId),
+                    ]
+                });
+                console.log("Player added to transaction:", player.name);
+            });
+
+            // Execute the transaction block with a single wallet approval
+            const result = await signAndExecuteTransaction({
+                transaction: tx
+            });
+
+            console.log("Transaction result:", result);
+
+            setIsMinting("minted");
+
+        } catch (error: any) {
+            console.error('Error in club creation process:', error);
+            setIsMinting("not-minting");
+        }
+    };
+
+    return (
+        <div className="mx-auto min-h-screen p-4 bg-gray-900">
+            <div className='max-w-6xl mx-auto'>
+                <h1 className="text-4xl font-bold text-center my-6 text-cyan-400">Team Setup</h1>
+
+                {!isGenerating && players?.length === 0 && (
+                    <div className="text-center text-gray-300 my-14 border border-gray-700 max-w-4xl mx-auto p-6 transition-all duration-400 ease-in-out">
+                        <p className="mb-4">Assemble your dream football squad — each player is algorithmically generated with balanced roles, diverse nationalities, and unique traits tailored for competitive play.</p>
+                        <p className="text-sm opacity-75">Powered by AI, every player comes with a distinctive skillset and a procedurally generated portrait, making your team truly one of a kind.</p>
+                    </div>
+
+                )}
+
+                {players?.length === 0 && (
+                    <div className="flex justify-center mb-8">
+                        <button
+                            onClick={generateTeam}
+                            disabled={isGenerating}
+                            className="bg-cyan-600 text-white py-3 px-6 font-bold text-lg hover:bg-cyan-700 disabled:bg-gray-600 disabled:opacity-70 transition-colors shadow-lg"
+                        >
+                            {isGenerating ? 'Generating Team...' : 'Generate Random Team'}
+                        </button>
+                    </div>
+                )}
 
                 {error && (
-                    <div className="w-full p-4 mb-6 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center">
+                    <div className="w-full p-4 mb-6 bg-red-900/40 border border-red-700 text-red-200 rounded-lg text-center">
                         {error}
                     </div>
                 )}
 
                 {isGenerating && (
                     <div className="mb-8">
-                        <div className="flex justify-between text-sm mb-1">
-                            <span>Generating player images...</span>
+                        <div className="flex justify-between text-sm mb-1 text-gray-300">
+                            <span>Generating player profiles...</span>
                             <span>{generationProgress}%</span>
                         </div>
-                        <div className="w-full bg-gray-200 rounded-full h-4">
+                        <div className="w-full bg-gray-700 rounded-full h-4">
                             <div
                                 className="bg-cyan-600 h-4 rounded-full transition-all duration-300 ease-in-out"
                                 style={{ width: `${generationProgress}%` }}
@@ -313,11 +289,31 @@ export default function FootballPlayerGenerator() {
 
                 {players && players.length > 0 && (
                     <div>
-                        <h2 className="text-2xl font-bold mb-4 text-gray-300">My Team</h2>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-bold text-gray-300">Player Profiles</h2>
+                            {isMinting === "not-minting" || isMinting === "minting" ? (
+                                <Button
+                                    className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white py-2 px-4 hover:from-cyan-700 hover:to-cyan-600 transition-all shadow-lg flex items-center gap-2"
+                                    onClick={handleMintPlayers}
+                                    disabled={isMinting == "minting" || isGenerating}
+                                >
+                                    <span>{isMinting == "minting" ? "Minting..." : isMinting == "not-minting" ? "Mint Players" : ""}</span>
+                                    <Droplet className="w-4 h-4" />
+                                </Button>
+                            ) : (
+                                <Button
+                                    className="bg-gradient-to-r from-cyan-600 to-cyan-500 text-white py-2 px-4 hover:from-cyan-700 hover:to-cyan-600 transition-all shadow-lg flex items-center gap-2"
+                                    onClick={() => redirect("/main")}
+                                >
+                                    Let&apos;s Begin
+                                    <Droplet className="w-4 h-4" />
+                                </Button>
+                            )}
+                        </div>
                         <div className="mb-6">
-                            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-4">
-                                {players.map(player => (
-                                    <PlayerCard key={player.id} player={player} />
+                            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                                {players.map((player, index) => (
+                                    <PlayerCard key={index} player={player} />
                                 ))}
                             </div>
                         </div>

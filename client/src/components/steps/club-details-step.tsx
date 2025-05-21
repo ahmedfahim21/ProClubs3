@@ -150,7 +150,7 @@ export function ClubDetailsStep({ data, updateData, onNext, onBack }: ClubDetail
         type="button"
         variant="outline"
         onClick={onBack}
-        className="px-4 py-2 border-gray-700 text-gray-800 hover:bg-gray-800 hover:text-gray-200 rounded-none"
+        className="px-4 h-9 py-2 bg-gray-850 border-cyan-500 text-cyan-500 hover:bg-white/90 hover:text-cyan-500 rounded-none transition-all"
         >
         Back
         </Button>

@@ -1,8 +1,7 @@
 "use client"
-
-import { UploadedBlob } from "@/app/init/page"
 import { Button } from "@/components/ui/button"
 import Image from "next/image"
+import { redirect } from "next/navigation"
 
 interface ReviewStepProps {
   formData: {
@@ -22,11 +21,10 @@ interface ReviewStepProps {
   onBack: () => void
   onSubmit: () => void
   isCreating: boolean
-  walrusStatus: { stage: string, message: string }
-  uploadedBlobs: UploadedBlob[]
+  isMinted: boolean
 }
 
-export function ReviewStep({ formData, onBack, onSubmit, isCreating, walrusStatus, uploadedBlobs }: ReviewStepProps) {
+export function ReviewStep({ formData, onBack, onSubmit, isCreating, isMinted }: ReviewStepProps) {
   return (
     <div className="max-w-xs mx-auto">
       <div className="mt-6 bg-gray-800 rounded-xl shadow-2xl w-full p-4 flex flex-col items-center">
@@ -65,33 +63,35 @@ export function ReviewStep({ formData, onBack, onSubmit, isCreating, walrusStatu
       </div>
 
       <div className="pt-4 flex flex-col gap-3">
-        {walrusStatus.stage === "error" && (
-          <div className="text-red-500 text-sm text-center">{walrusStatus.message}</div>
-        )}
-        {walrusStatus.stage === "success" && (
-          <div className="text-green-500 text-sm text-center">{walrusStatus.message}</div>
-        )}
-        {walrusStatus.stage === "pending" && (
-          <div className="text-cyan-400 text-sm text-center">{walrusStatus.message}</div>
-        )}
         <div className="flex justify-between items-center gap-4">
           <Button
         type="button"
         variant="outline"
         onClick={onBack}
-        className="px-4 py-2 border-gray-700 text-gray-800 hover:bg-gray-800 hover:text-gray-200 rounded-none"
-        disabled={isCreating}
+        className="px-4 h-9 py-2 bg-gray-850 border-cyan-500 text-cyan-500 hover:bg-white/90 hover:text-cyan-500 rounded-none transition-all"
+        disabled={isCreating || isMinted}
           >
         Back
           </Button>
-          <Button
+
+        {!isMinted ?
+          (<Button
         type="submit"
         className="flex-1 h-10 bg-gradient-to-r from-cyan-600 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-none font-medium text-white shadow-md transition-all"
         disabled={isCreating}
         onClick={onSubmit}
           >
         {isCreating ? "Creating..." : "Create Club & Mint NFT"}
-          </Button>
+          </Button>)
+          :
+          (<Button
+        type="button"
+        className="flex-1 h-10 bg-gradient-to-r from-cyan-600 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 rounded-none font-medium text-white shadow-md transition-all"
+        onClick={() => redirect("/init/team")}
+          >
+          Go to Team
+          </Button>)
+        }
         </div>
       </div>
     </div>
