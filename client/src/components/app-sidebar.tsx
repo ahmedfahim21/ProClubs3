@@ -6,7 +6,6 @@ import {
   Home, 
   Users, 
   Workflow, 
-  BarChart2,
   Calendar, 
   Trophy, 
   Search, 
@@ -49,12 +48,10 @@ export default function AppSidebar() {
     { icon: <Users size={20} />, label: "Squad", href: "/main/squad" },
     { icon: <Workflow size={20} />, label: "Tactics", href: "/main/tactics" },
     { icon: <Calendar size={20} />, label: "Schedule", href: "/main/schedule" },
-    { icon: <Trophy size={20} />, label: "Competitions", href: "/main/competitions" },
-    { icon: <ShoppingBag size={20} />, label: "Marketplace", href: "/main/marketplace" },
-    { icon: <Search size={20} />, label: "Transfers", href: "/main/transfers" },
+    { icon: <Trophy size={20} />, label: "Matches", href: "/main/competitions" },
+    { icon: <ShoppingBag size={20} />, label: "Transfers", href: "/main/transfers" },
     { icon: <Building size={20} />, label: "Club Info", href: "/main/club-info" },
-    { icon: <Banknote size={20} />, label: "Finances", href: "/main/finances" },
-    { icon: <GraduationCap size={20} />, label: "Dev. Centre", href: "/main/dev-centre" },
+    { icon: <Banknote size={20} />, label: "Finances", href: "/main/finances" }
   ]
 
   return (
@@ -94,7 +91,7 @@ export default function AppSidebar() {
             const isActive = pathname === item.href;
             return (
               <Link href={item.href} key={index} className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-md cursor-pointer transition-all font-light",
+                    "flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer transition-all font-light",
                     isActive
                       ? "bg-cyan-600 shadow-md"
                       : "hover:bg-cyan-600/50 text-cyan-100"

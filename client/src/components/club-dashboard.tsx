@@ -8,7 +8,6 @@ export function ClubDashboard() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-semibold">Latest Updates</h2>
-        <div className="text-sm text-muted-foreground">Last updated: 5 minutes ago</div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-auto">

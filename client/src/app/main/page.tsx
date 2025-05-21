@@ -4,6 +4,7 @@ import {useWallet} from '@suiet/wallet-kit';
 import { useEffect, useState } from "react";
 import { suiClient } from "@/utils/sui-client";
 import Image from 'next/image';
+import { Transaction } from '@mysten/sui/transactions';
 
 export default function Main() {
 
@@ -27,8 +28,8 @@ export default function Main() {
           // Optional filter by type
           filter: {
             MoveModule : {
-              package: process.env.NEXT_PUBLIC_CLUB_NFT_PACKAGE_ID || "0x1",
-              module: "club_nft",
+              package: process.env.NEXT_PUBLIC_PACKAGE_ID || "0x1",
+              module: "club",
             },
           },
         });
@@ -56,7 +57,7 @@ export default function Main() {
         
         // Query objects owned by the connected wallet
         const response = await suiClient.getObject({
-          id: objects[3].data.objectId,
+          id: objects[0].data.objectId,
           options: { showContent: true },
         });
 
@@ -123,6 +124,38 @@ const fetchClubDetails = async () => {
     console.error('Error fetching club details:', err);
   }
 };
+
+
+useEffect(() => {
+  async function getPlayerAttributes() {
+    if (!account || !main) return;
+    
+    try {
+      const playerNftId = main?.fields?.player_nft_id;
+      if (!playerNftId) return;
+      
+      const tx = new Transaction();
+      tx.moveCall({
+        target: `${process.env.NEXT_PUBLIC_PACKAGE_ID}::player_module::get_player_attributes`,
+        arguments: [tx.object(playerNftId)]
+      });
+
+      const result = await suiClient.devInspectTransactionBlock({
+        transactionBlock: tx,
+        sender: address,
+      });
+
+      const attributes = result.effects;
+      console.log("Player attributes:", attributes);
+      
+    } catch (error) {
+      console.error("Error getting player attributes:", error);
+    }
+  }
+  
+  getPlayerAttributes();
+}, [account, main, address]);
+
 
 
   return (
