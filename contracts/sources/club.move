@@ -20,8 +20,30 @@ module proclubs3::club {
         goals_conceded: u64,
     }
 
+    public struct ClubRegistry has key {
+        id: UID,
+        clubs: vector<ID>,
+        total_clubs: u64,
+    }
+
+    public struct ClubCreated has copy, drop {
+        club_id: ID,
+        owner: address,
+        name: String,
+    }
+
+    fun init(ctx: &mut TxContext) {
+        let registry = ClubRegistry {
+            id: object::new(ctx),
+            clubs: vector::empty<ID>(),
+            total_clubs: 0,
+        };
+        transfer::share_object(registry);
+    }
+
     /// Public entry function to mint a new ClubNFT
     public entry fun create_club(
+        registry: &mut ClubRegistry,
         name: String,
         location: String,
         stadium: String,
@@ -56,6 +78,19 @@ module proclubs3::club {
             goals_scored,
             goals_conceded
         };
+
+        let club_id = object::id(&nft);
+
+        vector::push_back(&mut registry.clubs, club_id);
+        registry.total_clubs = registry.total_clubs + 1;
+
+        sui::event::emit(ClubCreated {
+            club_id,
+            owner: tx_context::sender(ctx),
+            name: nft.name
+        });
+
+
         transfer::public_transfer(nft, tx_context::sender(ctx));
     }
 
@@ -68,9 +103,10 @@ module proclubs3::club {
         nft.goals_scored = goals_scored;
         nft.goals_conceded = goals_conceded;
     }
+
     /// Update tactics of the ClubNFT
     public fun update_tactics(nft: &mut ClubNFT, formation: String, style: String) {
         nft.formation = formation;
         nft.style = style;
-    } 
+    }
 }
