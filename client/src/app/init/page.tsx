@@ -31,6 +31,7 @@ export default function ClubCreator() {
   const [isMinted, setIsMinted] = useState(false);
 
   const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x1";
+  const REGISTRY_ID = process.env.NEXT_PUBLIC_REGISTRY_OBJECT_ID || "0x1";
 
   // Create on-chain ClubNFT
   const createClubNFT = async (logoBlobId: string) => {
@@ -44,6 +45,7 @@ export default function ClubCreator() {
       tx.moveCall({
         target: `${PACKAGE_ID}::club::create_club`,
         arguments: [
+          tx.object(REGISTRY_ID),
           tx.pure.string(formData.basicInfo.name),
           tx.pure.string(formData.basicInfo.location),
           tx.pure.string(formData.clubDetails.stadium),
@@ -162,7 +164,7 @@ export default function ClubCreator() {
           </p>
         </div>
 
-        <div className="bg-gray-900 border border-gray-800 rounded-none p-6 shadow-lg w-6xl mx-auto justify-center">
+        <div className="bg-gray-900 border border-gray-800 p-6 w-6xl mx-auto justify-center">
           <div className="border-b border-gray-800 px-4 py-2">
             <ClubCreationStepper steps={steps} currentStep={currentStep} />
           </div>

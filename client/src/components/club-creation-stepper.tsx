@@ -27,13 +27,12 @@ export function ClubCreationStepper({ steps, currentStep }: ClubCreationStepperP
         {steps.map((step, index) => {
           const isCompleted = index < currentStep;
           const isCurrent = index === currentStep;
-          const isUpcoming = index > currentStep;
           
           return (
             <li key={step.id} className="relative flex flex-col items-center">
               <div
                 className={cn(
-                  "flex h-10 w-10 items-center justify-center rounded-full z-10 shadow-sm transition-all duration-300",
+                  "flex h-10 w-10 items-center justify-center rounded-full z-10 transition-all duration-300 shadow-lg shadow-cyan-500/20",
                   isCompleted 
                     ? "bg-cyan-500 text-white" 
                     : isCurrent

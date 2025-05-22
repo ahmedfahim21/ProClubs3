@@ -1,5 +1,6 @@
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/app-sidebar";
+import Navbar from "@/components/navbar";
 
 export default function MainLayout({
     children,
@@ -7,9 +8,16 @@ export default function MainLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <SidebarProvider>
+        <main className="flex h-screen bg-gray-900 text-white">
+            <SidebarProvider>
             <AppSidebar />
-            {children}
-        </SidebarProvider>
+            <div className="flex flex-col flex-1">
+                <Navbar />
+                <div className="flex-1 overflow-auto">
+                {children}
+                </div>
+            </div>
+            </SidebarProvider>
+        </main>
     );
 }

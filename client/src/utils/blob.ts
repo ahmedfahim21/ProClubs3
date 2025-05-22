@@ -92,8 +92,31 @@ export const storeBlob = async (file: any, storage_epochs: number, connected: bo
         console.log('Blob info:', blobInfo);
         return blobInfo;
 
-    } catch (error: any) {
+    } catch (error) {
         console.error('Error storing blob:', error);
         throw error;
     }
+};
+
+export const fetchBlobData = async (blobId: string) => {
+  try {
+    const response = await fetch(`${WALRUS_AGGREGATOR_URL}/v1/blobs/${blobId}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to fetch blob: ${response.statusText}`);
+    }
+    
+    const blob = await response.blob();
+    console.log("Blob response:", response);
+
+    
+    // Create an object URL directly
+    const blobUrl = URL.createObjectURL(blob);
+    console.log("Blob URL created:", blobUrl);
+    
+    return blobUrl;
+  } catch (error) {
+    console.error(`Error fetching blob ${blobId}:`, error);
+    throw error;
+  }
 };

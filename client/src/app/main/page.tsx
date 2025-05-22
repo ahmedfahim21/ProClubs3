@@ -4,19 +4,19 @@ import {useWallet} from '@suiet/wallet-kit';
 import { useEffect, useState } from "react";
 import { suiClient } from "@/utils/sui-client";
 import Image from 'next/image';
-import { Transaction } from '@mysten/sui/transactions';
+import { fetchBlobData } from '@/utils/blob';
 
 export default function Main() {
 
   const { account, address } = useWallet()
-  const [objects, setObjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [main, setMain] = useState(null);
+  const [main, setMain] = useState<any>(null);
+  const [clubId, setClubId] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchOwnedObjects() {
-      if (!account) return;
+      if (!account || !address) return;
       
       try {
         setLoading(true);
@@ -24,7 +24,7 @@ export default function Main() {
         // Query objects owned by the connected wallet
         const response = await suiClient.getOwnedObjects({
           owner: address,
-          options: { showContent: true },
+          options: { showContent: false },
           // Optional filter by type
           filter: {
             MoveModule : {
@@ -35,8 +35,14 @@ export default function Main() {
         });
 
         console.log("Owned objects:", response.data);
+        const fetchedClubId = response?.data[0]?.data?.objectId || "";
         
-        setObjects(response.data);
+        // Save clubId to localStorage for use in other pages
+        localStorage.setItem("clubId", fetchedClubId);
+        setClubId(fetchedClubId);
+        
+        console.log("Club ID saved to localStorage:", fetchedClubId);
+        
       } catch (error) {
         console.error("Error fetching objects:", error);
       } finally {
@@ -45,25 +51,23 @@ export default function Main() {
     }
 
     fetchOwnedObjects();
-  }, [account]);
-
+  }, [account, address]);
 
   useEffect(() => {
     async function fetchObject() {
-      if (!account) return;
+      if (!account || !clubId) return;
       
       try {
         setLoading(true);
         
         // Query objects owned by the connected wallet
         const response = await suiClient.getObject({
-          id: objects[0].data.objectId,
+          id: clubId,
           options: { showContent: true },
         });
 
-        console.log("Object data:", response.data);
-        await setMain(response.data?.content);
-        await console.log("Main object:", main);
+        setMain(response.data?.content);
+        console.log("Main object:", response);
         
       } catch (error) {
         console.error("Error fetching objects:", error);
@@ -71,103 +75,53 @@ export default function Main() {
         setLoading(false);
       }
     }
+    
     fetchObject();
-    fetchClubDetails();
-  }
+  }, [account, clubId]);
 
-  , [loading, objects]);
-
-
-const WALRUS_AGGREGATOR_URL = "https://aggregator.walrus-testnet.walrus.space";
-
-// Simplified approach using createObjectURL directly
-const fetchBlobData = async (blobId) => {
-  try {
-    const response = await fetch(`${WALRUS_AGGREGATOR_URL}/v1/blobs/${blobId}`);
-    
-    if (!response.ok) {
-      throw new Error(`Failed to fetch blob: ${response.statusText}`);
-    }
-    
-    // Get the blob data
-    const blob = await response.blob();
-    console.log("Blob data:", blob);
-    console.log("resp :", response);
-
-    
-    // Create an object URL directly
-    const blobUrl = URL.createObjectURL(blob);
-    console.log("Blob URL created:", blobUrl);
-    
-    return blobUrl;
-  } catch (error) {
-    console.error(`Error fetching blob ${blobId}:`, error);
-    throw error;
-  }
-};
-
-// Fetch club details using the Walrus blob IDs
-const fetchClubDetails = async () => {
-  try {
-    // Parse the blob IDs from the reference string
-    const logoBlobId = main?.fields?.logo_blob_id;
-    
-    // Fetch the logo image blob and get a blob URL
-    const logoUrl = await fetchBlobData(logoBlobId);
-    
-    // Set the image URL directly with the blob URL
-    setImageUrl(logoUrl);
-    
-    console.log("Logo URL set:", logoUrl);
-    
-  } catch (err) {
-    console.error('Error fetching club details:', err);
-  }
-};
-
-
-useEffect(() => {
-  async function getPlayerAttributes() {
-    if (!account || !main) return;
+  const fetchClubDetails = async () => {
+    if (!main?.fields?.logo_blob_id) return;
     
     try {
-      const playerNftId = main?.fields?.player_nft_id;
-      if (!playerNftId) return;
+      const logoBlobId = main?.fields?.logo_blob_id;
+      const logoUrl = await fetchBlobData(logoBlobId);
+      setImageUrl(logoUrl);
       
-      const tx = new Transaction();
-      tx.moveCall({
-        target: `${process.env.NEXT_PUBLIC_PACKAGE_ID}::player_module::get_player_attributes`,
-        arguments: [tx.object(playerNftId)]
-      });
-
-      const result = await suiClient.devInspectTransactionBlock({
-        transactionBlock: tx,
-        sender: address,
-      });
-
-      const attributes = result.effects;
-      console.log("Player attributes:", attributes);
+      console.log("Logo URL set:", logoUrl);
       
-    } catch (error) {
-      console.error("Error getting player attributes:", error);
+    } catch (err) {
+      console.error('Error fetching club details:', err);
     }
-  }
-  
-  getPlayerAttributes();
-}, [account, main, address]);
+  };
 
-
+  useEffect(() => {
+    if (main) {
+      fetchClubDetails();
+    }
+  }, [main]);
 
   return (
     <div>
       <h3>Your Objects</h3>
-      <Image src={imageUrl} alt="Club Logo" width={100} height={100} className="rounded-full" />
-      <p>{main?.fields?.name}</p>
-      <p>{main?.fields?.location}</p>
-      <p>{main?.fields?.stadium}</p>
-      <p>{main?.fields?.primary_color}</p>
-      <p>{main?.fields?.secondary_color}</p>
-
+      {loading && <p>Loading...</p>}
+      {imageUrl && (
+        <Image 
+          src={imageUrl} 
+          alt="Club Logo" 
+          width={100} 
+          height={100} 
+          className="rounded-full" 
+        />
+      )}
+      {main?.fields && (
+        <div>
+          <p>Name: {main.fields.name}</p>
+          <p>Location: {main.fields.location}</p>
+          <p>Stadium: {main.fields.stadium}</p>
+          <p>Primary Color: {main.fields.primary_color}</p>
+          <p>Secondary Color: {main.fields.secondary_color}</p>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   ChevronDown,
   Save,
@@ -9,6 +9,8 @@ import {
   GripVertical
 } from "lucide-react"
 import { FORMATIONS, PLAYING_STYLES, PLAYERS } from "@/utils/constants";
+import { Transaction } from "@mysten/sui/transactions";
+import { useSuiClient, useWallet } from "@suiet/wallet-kit";
 
 export default function FootballManager() {
   // State for selected formation and playing style
@@ -18,18 +20,24 @@ export default function FootballManager() {
   const [showStyleDropdown, setShowStyleDropdown] = useState(false);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
+  const { address } = useWallet();
 
   // Player swap functionality
   const [players, setPlayers] = useState(PLAYERS);
   const [draggedPlayerIndex, setDraggedPlayerIndex] = useState(null);
   const [dragOverPlayerIndex, setDragOverPlayerIndex] = useState(null);
 
-  // Handle saving tactics
-  const saveTactic = () => {
-    setUnsavedChanges(false);
-    setShowSaveConfirmation(true);
-    setTimeout(() => setShowSaveConfirmation(false), 2000);
-  };
+  const [clubId, setClubId] = useState<string | null>(null);
+  const { signTransaction } = useWallet();
+  const suiClient = useSuiClient();
+
+  useEffect(() => {
+    const storedClubId = localStorage.getItem("clubId");
+    if (storedClubId) {
+      setClubId(storedClubId);
+      console.log("Retrieved clubId from localStorage:", storedClubId);
+    }
+  }, []);
 
   // Get the positions for the current formation
   const currentFormationPositions = FORMATIONS[formation].positions;
@@ -97,12 +105,57 @@ export default function FootballManager() {
     return `${xClasses[x]} ${yClasses[y]}`;
   };
 
+  const handleSaveTactic = async () => {
+    if (!clubId || !address) {
+      console.error("Club ID is not set.");
+      return;
+    }
+
+    setUnsavedChanges(false);
+    setShowSaveConfirmation(true);
+
+    const txb = new Transaction();
+    txb.moveCall({
+      target: `${process.env.NEXT_PUBLIC_PACKAGE_ID}::club::update_tactics`,
+      arguments: [
+        txb.object(clubId),
+        txb.pure.string(formation),
+        txb.pure.string(playingStyle)
+      ],
+    });
+
+    txb.setSender(address);
+
+    const txBytes = await txb.build({ client: suiClient });
+
+    const response = await fetch('/api/sponsor-tx', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ txBytes: Array.from(txBytes), sender: address }),
+    });
+    const { sponsoredTxBytes, sponsorSignature } = await response.json();
+
+    console.log("Sponsored transaction bytes:", txBytes);
+
+    const userSignature = await signTransaction({ transaction: sponsoredTxBytes });
+
+    console.log("User signature:", userSignature, sponsorSignature);
+
+    await suiClient.executeTransactionBlock({
+      transactionBlock: sponsoredTxBytes,
+      signature: [userSignature.signature, sponsorSignature],
+    });
+
+  }
+
+
+
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-gray-900 text-gray-100 font-sans">
+    <div className="flex h-[92vh] w-full overflow-auto bg-gray-900 text-gray-100 font-sans">
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Main Tactics Area */}
-        <div className="flex-1 flex">
+        <div className="flex-1 flex h-full">
           {/* Left Tactics Panel */}
           <div className="w-[300px] bg-gray-800 border-r border-gray-700 flex flex-col p-4">
             <div className="flex items-center justify-between mb-6">
@@ -237,7 +290,7 @@ export default function FootballManager() {
 
               <button
                 className={`w-full text-sm ${unsavedChanges ? 'bg-cyan-700 hover:bg-cyan-600' : 'bg-gray-700 hover:bg-gray-600'} transition-colors px-3 py-2 flex items-center justify-center`}
-                onClick={saveTactic}
+                onClick={handleSaveTactic}
               >
                 <Save className="h-4 w-4 mr-2" />
                 <span>Save Tactic</span>
@@ -313,7 +366,7 @@ export default function FootballManager() {
 
 
           {/* Right Player Panel */}
-          <div className="flex-1 bg-green-900 relative overflow-hidden h-[98vh] m-2 my-auto">
+          <div className="flex-1 bg-green-900 relative overflow-hidden h-full m-2 my-auto">
 
             {/* Pitch markings */}
             <div className="absolute inset-0">

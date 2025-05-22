@@ -1,17 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { 
   Home, 
   Users, 
   Workflow, 
   Calendar, 
-  Trophy, 
-  Search, 
+  Trophy,
   Banknote, 
-  Building, 
-  GraduationCap,
+  Building,
   ChevronLeft,
   Newspaper,
   ShoppingBag
@@ -22,25 +20,21 @@ import { usePathname } from "next/navigation";
 
 export default function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false)
-  const [windowWidth, setWindowWidth] = useState(0)
+  const clickSoundRef = useRef<HTMLAudioElement | null>(null)
   
   const pathname = usePathname();
   
-  // Auto-collapse on smaller screens
   useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth)
-      if (window.innerWidth < 640) {
-        setCollapsed(true)
-      }
+    clickSoundRef.current = new Audio('/button.mp3'); 
+    clickSoundRef.current.volume = 0.5;
+  }, []);
+  
+  const playClickSound = () => {
+    if (clickSoundRef.current) {
+      clickSoundRef.current.currentTime = 0;
+      clickSoundRef.current.play().catch(err => console.error("Audio playback error:", err));
     }
-    
-    // Set initial value
-    handleResize()
-    
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  };
   
   const menuItems = [
     { icon: <Home size={20} />, label: "Home", href: "/main" },
@@ -48,7 +42,7 @@ export default function AppSidebar() {
     { icon: <Users size={20} />, label: "Squad", href: "/main/squad" },
     { icon: <Workflow size={20} />, label: "Tactics", href: "/main/tactics" },
     { icon: <Calendar size={20} />, label: "Schedule", href: "/main/schedule" },
-    { icon: <Trophy size={20} />, label: "Matches", href: "/main/competitions" },
+    { icon: <Trophy size={20} />, label: "Matches", href: "/main/matches" },
     { icon: <ShoppingBag size={20} />, label: "Transfers", href: "/main/transfers" },
     { icon: <Building size={20} />, label: "Club Info", href: "/main/club-info" },
     { icon: <Banknote size={20} />, label: "Finances", href: "/main/finances" }
@@ -77,7 +71,10 @@ export default function AppSidebar() {
           </div>
         )}
         <button 
-          onClick={() => setCollapsed(!collapsed)} 
+          onClick={() => {
+            playClickSound();
+            setCollapsed(!collapsed);
+          }} 
           className="w-6 h-6 rounded hover:bg-cyan-600 flex items-center justify-center"
         >
           <ChevronLeft size={16} className={cn("transition-transform", collapsed && "rotate-180")} />
@@ -90,30 +87,35 @@ export default function AppSidebar() {
           {menuItems.map((item, index) => {
             const isActive = pathname === item.href;
             return (
-              <Link href={item.href} key={index} className={cn(
-                    "flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer transition-all font-light",
-                    isActive
-                      ? "bg-cyan-600 shadow-md"
-                      : "hover:bg-cyan-600/50 text-cyan-100"
-                  )}>
-                  <div
+              <Link 
+                href={item.href} 
+                key={index} 
+                onClick={playClickSound}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2.5 rounded-sm cursor-pointer transition-all font-light",
+                  isActive
+                    ? "bg-cyan-600 shadow-md"
+                    : "hover:bg-cyan-600/50 text-cyan-100"
+                )}
+              >
+                <div
+                  className={cn(
+                    "flex items-center justify-center",
+                    isActive ? "text-white" : "text-cyan-200"
+                  )}
+                >
+                  {item.icon}
+                </div>
+                {!collapsed && (
+                  <span
                     className={cn(
-                      "flex items-center justify-center",
-                      isActive ? "text-white" : "text-cyan-200"
+                      "font-medium text-sm whitespace-nowrap",
+                      isActive ? "text-white" : "text-cyan-100"
                     )}
                   >
-                    {item.icon}
-                  </div>
-                  {!collapsed && (
-                    <span
-                      className={cn(
-                        "font-medium text-sm whitespace-nowrap",
-                        isActive ? "text-white" : "text-cyan-100"
-                      )}
-                    >
-                      {item.label}
-                    </span>
-                  )}
+                    {item.label}
+                  </span>
+                )}
               </Link>
             );
           })}
@@ -126,7 +128,7 @@ export default function AppSidebar() {
           <div className="px-4 py-2 text-xs text-cyan-300 text-center">
             <hr className="border-t border-cyan-600 m-1" />
             © 2025 ProClubs3
-            </div>
+          </div>
         )}
       </div>
     </div>

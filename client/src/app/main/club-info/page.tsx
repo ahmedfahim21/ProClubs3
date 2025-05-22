@@ -1,129 +1,204 @@
 "use client";
+import { fetchBlobData } from '@/utils/blob';
+import { suiClient } from '@/utils/sui-client';
+import { Trophy, MapPin, Users, Target, Shield, Calendar, SquareMenu, BadgePercent } from 'lucide-react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
 
-import { Card } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import Image from "next/image";
+const ClubDashboard = () => {
 
-export default function ClubInfoPage() {
-  return (
-    <div className="w-full mx-auto py-10 px-4 space-y-8 bg-gray-900">
-      {/* Club Overview */}
-      <div className="flex flex-col md:flex-row items-center gap-8">
-        <Image
-          src="/ProClubs3.png"
-          alt="Club Logo"
-          width={120}
-          height={120}
-          className=""
-        />
+  const [clubId, setClubId] = useState<string | null>(null);
+  const [clubData, setClubData] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const storedClubId = localStorage.getItem("clubId");
+    if (storedClubId) {
+      setClubId(storedClubId);
+      console.log("Retrieved clubId from localStorage:", storedClubId);
+    }
+  }, []);
+
+  useEffect(() => {
+    async function fetchClubData() {
+      if (!clubId) return;
+
+      try {
+        setLoading(true);
+
+        const response = await suiClient.getObject({
+          id: clubId,
+          options: { showContent: true },
+        });
+
+        setClubData(response.data?.content);
+        console.log("Club data fetched:", response.data?.content);
+        try {
+          // @ts-expect-error handled
+          const logoBlobId = response.data?.content?.fields?.logo_blob_id;
+          const logoUrl = await fetchBlobData(logoBlobId);
+          setImageUrl(logoUrl);
+
+          console.log("Logo URL set:", logoUrl);
+
+        } catch (err) {
+          console.error('Error fetching club details:', err);
+        }
+
+      } catch (error) {
+        console.error("Error fetching club data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchClubData();
+  }, [clubId]);
+
+  const StatCard = ({ icon: Icon, label, value, color = "text-cyan-400" }: { 
+    icon: React.ElementType; 
+    label: string; 
+    value: string | number; 
+    color?: string;
+  }) => (
+    <div className="bg-gray-800 p-6 border border-gray-700 hover:border-cyan-500 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/20">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold mb-2">FC United</h1>
-          <div className="text-blue-700 font-semibold text-lg mb-1">Founded: 1892</div>
-          <div className="text-gray-600">City: Manchester, England</div>
-          <div className="text-gray-600">Nickname: The Reds</div>
-          <div className="text-gray-600">Stadium: United Stadium (60,000)</div>
+          <p className="text-gray-400 text-sm font-medium mb-1">{label}</p>
+          <p className={`text-2xl font-bold ${color}`}>{value}</p>
         </div>
+        <Icon className="w-8 h-8 text-cyan-500" />
       </div>
-
-      <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="flex flex-wrap gap-2 mb-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="history">History</TabsTrigger>
-          <TabsTrigger value="honors">Honors</TabsTrigger>
-          <TabsTrigger value="staff">Staff</TabsTrigger>
-          <TabsTrigger value="finances">Finances</TabsTrigger>
-          <TabsTrigger value="culture">Club Culture</TabsTrigger>
-        </TabsList>
-
-        {/* Overview Tab */}
-        <TabsContent value="overview">
-          <Card className="p-6 space-y-4">
-            <div className="text-lg font-semibold">Stadium</div>
-            <div className="flex flex-col md:flex-row gap-6 items-center">
-              <Image src="/stadium.jpg" alt="Stadium" width={320} height={180} className="rounded-lg shadow-md" />
-              <div>
-                <div className="font-bold">United Stadium</div>
-                <div>Capacity: 60,000</div>
-                <div>Pitch: Hybrid Grass</div>
-                <div>Year Opened: 1923 (Renovated 2024)</div>
-                <div>Facilities: Elite Training, Medical Centre, Youth Academy</div>
-              </div>
-            </div>
-          </Card>
-        </TabsContent>
-
-        {/* History Tab */}
-        <TabsContent value="history">
-          <Card className="p-6 space-y-2">
-            <div className="text-lg font-semibold mb-2">Club History</div>
-            <p>Founded in 1892, FC United has a rich tradition of attacking football and a passionate fanbase. The club has overcome financial crises, relegations, and triumphant returns to the top flight. Known for its youth development and iconic red kits, United is a symbol of resilience and ambition.</p>
-            <ul className="list-disc ml-6 mt-2 text-gray-700">
-              <li>First major trophy: FA Cup, 1908</li>
-              <li>European debut: 1956</li>
-              <li>Historic treble: 1999</li>
-              <li>Modern era resurgence: 2010s-present</li>
-            </ul>
-          </Card>
-        </TabsContent>
-
-        {/* Honors Tab */}
-        <TabsContent value="honors">
-          <Card className="p-6">
-            <div className="text-lg font-semibold mb-2">Major Honors</div>
-            <ul className="grid grid-cols-2 md:grid-cols-3 gap-2 text-gray-700">
-              <li>Premier League: 13</li>
-              <li>FA Cup: 8</li>
-              <li>League Cup: 5</li>
-              <li>Champions League: 3</li>
-              <li>Europa League: 2</li>
-              <li>FIFA Club World Cup: 1</li>
-            </ul>
-          </Card>
-        </TabsContent>
-
-        {/* Staff Tab */}
-        <TabsContent value="staff">
-          <Card className="p-6">
-            <div className="text-lg font-semibold mb-2">Key Staff</div>
-            <ul className="space-y-1">
-              <li><span className="font-bold">Manager:</span> David Miller</li>
-              <li><span className="font-bold">Assistant Manager:</span> Sarah Lee</li>
-              <li><span className="font-bold">Director of Football:</span> Michael Grant</li>
-              <li><span className="font-bold">Head of Youth Development:</span> Emma Brown</li>
-              <li><span className="font-bold">Chief Scout:</span> Tom Evans</li>
-              <li><span className="font-bold">Medical Lead:</span> Dr. Rachel Green</li>
-            </ul>
-          </Card>
-        </TabsContent>
-
-        {/* Finances Tab */}
-        <TabsContent value="finances">
-          <Card className="p-6">
-            <div className="text-lg font-semibold mb-2">Financial Overview</div>
-            <ul className="space-y-1 text-gray-700">
-              <li><span className="font-bold">Estimated Value:</span> £1.2 Billion</li>
-              <li><span className="font-bold">Annual Revenue:</span> £420 Million</li>
-              <li><span className="font-bold">Wage Budget:</span> £180 Million</li>
-              <li><span className="font-bold">Transfer Budget:</span> £60 Million</li>
-              <li><span className="font-bold">Debt:</span> £120 Million</li>
-            </ul>
-          </Card>
-        </TabsContent>
-
-        {/* Club Culture Tab */}
-        <TabsContent value="culture">
-          <Card className="p-6">
-            <div className="text-lg font-semibold mb-2">Club Culture & Philosophy</div>
-            <ul className="list-disc ml-6 text-gray-700 space-y-1">
-              <li>Attacking, possession-based football</li>
-              <li>Promote youth academy graduates</li>
-              <li>High-pressing, energetic style</li>
-              <li>Strong community engagement</li>
-              <li>Global fanbase with local roots</li>
-            </ul>
-          </Card>
-        </TabsContent>
-      </Tabs>
     </div>
   );
-} 
+
+  return (
+    <div className="min-h-screen w-full bg-gray-900 p-6 overflow-auto">
+      {loading ? (
+        <div className="flex items-center justify-center h-[80vh]">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-cyan-500"></div>
+        </div>
+      ) : !clubData ? (
+        <div className="text-center py-20">
+          <h2 className="text-2xl font-semibold text-gray-400 mb-4">No club data available</h2>
+        </div>
+      ) : (
+        <div className="max-w-7xl mx-auto">
+          {/* Header Section */}
+          <div className="p-4 mb-8"
+            style={{
+              background: `linear-gradient(135deg, ${clubData.fields.primary_color}80, ${clubData.fields.secondary_color}80)`,
+            }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <Image
+                  src={imageUrl || "/default-logo.png"}
+                  alt="Club Logo"
+                  width={100}
+                  height={100}
+                  className="rounded-sm shadow-lg"
+                />
+                <div>
+                  <h1 className="text-4xl font-bold text-white mb-2">{clubData.fields.name}</h1>
+                  <div className="flex items-center gap-4 text-gray-300">
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-5 h-5 text-cyan-500" />
+                      <span>{clubData.fields.location}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="w-5 h-5 text-cyan-500" />
+                      <span>{clubData.fields.stadium}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-gray-400 text-sm mb-1">Owner</p>
+                <p className="text-white text-sm">{clubData.fields.owner.slice(0, 8)}...{clubData.fields.owner.slice(-6)}</p>
+                <p className="text-gray-400 text-sm mb-1">Club ID</p>
+                <p className="text-sm text-white">{clubId?.slice(0, 8)}...{clubId?.slice(-6)}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <StatCard
+              icon={Calendar}
+              label="Matches Played"
+              value={clubData.fields.matches_played}
+              color="text-white"
+            />
+            <StatCard
+              icon={Trophy}
+              label="Matches Won"
+              value={clubData.fields.matches_won}
+              color="text-green-400"
+            />
+            <StatCard
+              icon={Target}
+              label="Goals Scored"
+              value={clubData.fields.goals_scored}
+              color="text-cyan-400"
+            />
+            <StatCard
+              icon={Shield}
+              label="Goals Conceded"
+              value={clubData.fields.goals_conceded}
+              color="text-red-400"
+            />
+          </div>
+
+          {/* Additional Stats Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <StatCard
+              icon={SquareMenu}
+              label="Draws"
+              value={clubData.fields.matches_drawn}
+              color="text-yellow-400"
+            />
+            <StatCard
+              icon={BadgePercent}
+              label="Losses"
+              value={clubData.fields.matches_lost}
+              color="text-red-400"
+            />
+            <StatCard
+              icon={Users}
+              label="Formation"
+              value={clubData.fields.formation}
+              color="text-purple-400"
+            />
+          </div>
+
+          {/* Performance Summary */}
+          <div className="mt-8 bg-gray-800 rounded-2xl p-8 border border-gray-700">
+            <h3 className="text-2xl font-semibold text-cyan-400 mb-6">Season Summary</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white mb-2">{clubData.fields.matches_played}</div>
+                <div className="text-gray-400 text-sm">Total Matches</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-green-400 mb-2">
+                  {clubData.fields.matches_played > 0 ?
+                    Math.round((parseInt(clubData.fields.matches_won) / parseInt(clubData.fields.matches_played)) * 100) : 0}%
+                </div>
+                <div className="text-gray-400 text-sm">Win Rate</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold text-cyan-400 mb-2">
+                  {parseInt(clubData.fields.goals_scored) - parseInt(clubData.fields.goals_conceded)}
+                </div>
+                <div className="text-gray-400 text-sm">Goal Difference</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ClubDashboard;
