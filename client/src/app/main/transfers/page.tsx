@@ -2,13 +2,11 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Tabs } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetClose } from "@/components/ui/sheet";
-import { Users, ArrowRightLeft, Search, CheckCircle, Clock, XCircle, Star } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { ArrowRightLeft, Search, Clock, Star } from "lucide-react";
 import { Icon } from "lucide-react";
 import { soccerBall } from "@lucide/lab";
 
@@ -202,17 +200,16 @@ export default function TransfersPage() {
                 {filteredTransfers.map(t => (
                   <tr key={t.id} className="border-b border-gray-800 hover:bg-gray-800/50 transition cursor-pointer" onClick={() => { setSelected(t); setDrawerOpen(true); }}>
                     <td className="px-4 py-3 flex items-center gap-2">
-                      <img src={t.player.photo} alt={t.player.name} className="h-8 w-8 rounded-full border border-gray-700" />
                       <span className="font-medium text-white">{t.player.name}</span>
                     </td>
                     <td className="px-4 py-3">{t.player.position}</td>
                     <td className="px-4 py-3">{t.player.age}</td>
                     <td className="px-4 py-3 flex items-center gap-2">
-                      <img src={t.fromClub.badge} alt={t.fromClub.name} className="h-6 w-6 rounded" />
+                      
                       <span>{t.fromClub.name}</span>
                     </td>
                     <td className="px-4 py-3 flex items-center gap-2">
-                      <img src={t.toClub.badge} alt={t.toClub.name} className="h-6 w-6 rounded" />
+                      
                       <span>{t.toClub.name}</span>
                     </td>
                     <td className="px-4 py-3">{t.fee}</td>
@@ -244,15 +241,14 @@ export default function TransfersPage() {
                 {history.map(t => (
                   <tr key={t.id} className="border-b border-gray-800 hover:bg-gray-800/50 transition cursor-pointer" onClick={() => { setSelected(t); setDrawerOpen(true); }}>
                     <td className="px-4 py-3 flex items-center gap-2">
-                      <img src={t.player.photo} alt={t.player.name} className="h-8 w-8 rounded-full border border-gray-700" />
                       <span className="font-medium text-white">{t.player.name}</span>
                     </td>
                     <td className="px-4 py-3 flex items-center gap-2">
-                      <img src={t.fromClub.badge} alt={t.fromClub.name} className="h-6 w-6 rounded" />
+                      
                       <span>{t.fromClub.name}</span>
                     </td>
                     <td className="px-4 py-3 flex items-center gap-2">
-                      <img src={t.toClub.badge} alt={t.toClub.name} className="h-6 w-6 rounded" />
+                      
                       <span>{t.toClub.name}</span>
                     </td>
                     <td className="px-4 py-3">{t.fee}</td>
@@ -280,13 +276,12 @@ export default function TransfersPage() {
                 {shortlist.map(t => (
                   <tr key={t.id} className="border-b border-gray-800 hover:bg-gray-800/50 transition cursor-pointer" onClick={() => { setSelected(t); setDrawerOpen(true); }}>
                     <td className="px-4 py-3 flex items-center gap-2">
-                      <img src={t.player.photo} alt={t.player.name} className="h-8 w-8 rounded-full border border-gray-700" />
                       <span className="font-medium text-white">{t.player.name}</span>
                     </td>
                     <td className="px-4 py-3">{t.player.position}</td>
                     <td className="px-4 py-3">{t.player.age}</td>
                     <td className="px-4 py-3 flex items-center gap-2">
-                      <img src={t.fromClub.badge} alt={t.fromClub.name} className="h-6 w-6 rounded" />
+                      
                       <span>{t.fromClub.name}</span>
                     </td>
                     <td className="px-4 py-3">
@@ -310,16 +305,14 @@ export default function TransfersPage() {
             <>
               <SheetHeader>
                 <SheetTitle className="flex items-center gap-2">
-                  <img src={selected.player.photo} alt={selected.player.name} className="h-10 w-10 rounded-full border border-gray-700" />
                   <span>{selected.player.name}</span>
                   <span className="ml-2 px-2 py-1 rounded text-xs font-semibold bg-gray-800 text-blue-400">{selected.player.position}</span>
                 </SheetTitle>
                 <SheetDescription>
                   <div className="flex items-center gap-2 mt-2">
-                    <img src={selected.fromClub.badge} alt={selected.fromClub.name} className="h-6 w-6 rounded" />
                     <span className="text-gray-400">{selected.fromClub.name}</span>
                     <ArrowRightLeft className="h-4 w-4 text-blue-400 mx-2" />
-                    {selected.toClub && <><img src={selected.toClub.badge} alt={selected.toClub.name} className="h-6 w-6 rounded" />
+                    {selected.toClub && <>x
                     <span className="text-gray-400">{selected.toClub.name}</span></>}
                   </div>
                   <div className="mt-2 text-sm text-gray-300">{selected.details}</div>

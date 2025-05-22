@@ -6,7 +6,7 @@ import HeroSection from '@/components/hero-section';
 import Navbar from '@/components/landing-navbar';
 import SectionWrapper from '@/components/section-wrapper';
 import { Button } from '@/components/ui/button';
-import { Users, ShieldCheck, BarChart3, Coins, Play, Settings, Check, Plus, X, Calendar, Flag, CircleDollarSign, ArrowRight } from 'lucide-react';
+import { Users, ShieldCheck, BarChart3, Coins, Play, Settings, Plus, X, CircleDollarSign, ArrowRight } from 'lucide-react';
 import React, { useEffect } from 'react';
 
 const coreFeatures = [

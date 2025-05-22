@@ -176,7 +176,7 @@ export default function FootballPlayerGenerator() {
         }
     };
 
-    const { connected, account, address, signAndExecuteTransaction } = useWallet();
+    const { connected, address, signAndExecuteTransaction } = useWallet();
     const [isMinting, setIsMinting] = useState<"not-minting" | "minting" | "minted">("not-minting");
 
     const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x1";

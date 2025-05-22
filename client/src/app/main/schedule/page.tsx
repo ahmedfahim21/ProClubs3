@@ -33,7 +33,6 @@ const matches = [
 ]
 
 function getMonthDays(year: number, month: number) {
-  const firstDay = new Date(year, month, 1)
   const lastDay = new Date(year, month + 1, 0)
   const days = []
   for (let i = 1; i <= lastDay.getDate(); i++) {
@@ -71,7 +70,6 @@ export default function SchedulePage() {
     }
   }
 
-  const monthName = today.toLocaleString('default', { month: 'long' })
   const displayMonth = new Date(currentYear, currentMonth).toLocaleString('default', { month: 'long', year: 'numeric' })
 
   return (

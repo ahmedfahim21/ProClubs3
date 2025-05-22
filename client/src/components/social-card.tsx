@@ -2,6 +2,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Twitter, Instagram, Facebook, MessageSquare, Heart, CheckCircle } from "lucide-react"
+import Image from "next/image"
 
 interface SocialCardProps {
   platform: "twitter" | "instagram" | "facebook" | "expert"
@@ -77,7 +78,7 @@ export function SocialCard({
         <p className="text-sm text-gray-200">{content}</p>
         {imageUrl && (
           <div className="mt-3 rounded-md overflow-hidden">
-            <img src={imageUrl || "/placeholder.webp"} alt="Social media post" className="w-full h-auto" />
+            <Image src={imageUrl || "/placeholder.webp"} alt="Social media post" className="w-full h-auto" width={500} height={300} />
           </div>
         )}
       </CardContent>

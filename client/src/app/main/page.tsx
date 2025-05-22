@@ -79,23 +79,24 @@ export default function Main() {
     fetchObject();
   }, [account, clubId]);
 
-  const fetchClubDetails = async () => {
-    if (!main?.fields?.logo_blob_id) return;
-    
-    try {
-      const logoBlobId = main?.fields?.logo_blob_id;
-      const logoUrl = await fetchBlobData(logoBlobId);
-      setImageUrl(logoUrl);
-      
-      console.log("Logo URL set:", logoUrl);
-      
-    } catch (err) {
-      console.error('Error fetching club details:', err);
-    }
-  };
 
   useEffect(() => {
     if (main) {
+      const fetchClubDetails = async () => {
+        if (!main?.fields?.logo_blob_id) return;
+        
+        try {
+          const logoBlobId = main?.fields?.logo_blob_id;
+          const logoUrl = await fetchBlobData(logoBlobId);
+          setImageUrl(logoUrl);
+          
+          console.log("Logo URL set:", logoUrl);
+          
+        } catch (err) {
+          console.error('Error fetching club details:', err);
+        }
+      };
+      
       fetchClubDetails();
     }
   }, [main]);

@@ -3,19 +3,31 @@
 import { Button } from "@/components/ui/button";
 import { fetchBlobData } from "@/utils/blob";
 import { suiClient } from "@/utils/sui-client";
-import { Building, BuildingIcon, LocateIcon, LocationEdit, PinIcon } from "lucide-react";
+import { BuildingIcon, LocationEdit } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+interface IClub {
+  fields: {
+    name: string;
+    location: string;
+    stadium: string;
+    matches_played: number;
+    matches_won: number;
+    matches_drawn: number;
+    matches_lost: number;
+    goals_scored: number;
+    goals_conceded: number;
+  };
+  logoUrl?: string;
+}
+
 export default function CompetitionsPage() {
   const REGISTRY_OBJECT_ID = process.env.NEXT_PUBLIC_REGISTRY_OBJECT_ID || "0x1";
-  const [clubs, setClubs] = useState<any[]>([]);
+  const [clubs, setClubs] = useState<IClub[]>([]);
   const [clubId, setClubId] = useState<string | null>(null);
-  const [clubData, setClubData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  // Step 1: Fetch own club ID from localStorage
   useEffect(() => {
     const storedClubId = localStorage.getItem("clubId");
     if (storedClubId) {
@@ -28,72 +40,69 @@ export default function CompetitionsPage() {
   }, []);
 
   useEffect(() => {
-      if (!clubId) return;
+    if (!clubId) return;
 
-        fetchOtherClubs(clubId);
-
-  }, [clubId]);
-
-  // Function to fetch other clubs from registry
-  async function fetchOtherClubs(ownClubId: string) {
-    try {
-      const registryObject = await suiClient.getObject({
-        id: REGISTRY_OBJECT_ID,
-        options: {
-          showContent: true,
-        }
-      });
-
-      // @ts-expect-error handled
-      const clubIds = registryObject.data?.content?.fields?.clubs || [];
-      
-      const otherClubIds = clubIds.filter((id: string) => id !== ownClubId);
-
-      
-      // Fetch each club's data
-      const clubDataPromises = otherClubIds.map(async (id: string) => {
-        try {
-          const response = await suiClient.getObject({
-            id: id,
-            options: { showContent: true },
-          });
-          
-          // Add logo URL to club data
-          const clubContent = response.data?.content;
-          if (clubContent) {
-            try {
-              // @ts-expect-error handled
-              const logoBlobId = clubContent.fields?.logo_blob_id;
-              if (logoBlobId) {
-                const logoUrl = await fetchBlobData(logoBlobId);
-                return { ...clubContent, logoUrl };
-              }
-            } catch (err) {
-              console.error(`Error fetching logo for club ${id}:`, err);
-            }
+    async function fetchOtherClubs(ownClubId: string) {
+      try {
+        const registryObject = await suiClient.getObject({
+          id: REGISTRY_OBJECT_ID,
+          options: {
+            showContent: true,
           }
-          return clubContent;
-        } catch (error) {
-          console.error(`Error fetching club ${id}:`, error);
-          return null;
-        }
-      });
+        });
 
-      const fetchedClubs = await Promise.all(clubDataPromises);
-      const validClubs = fetchedClubs.filter(club => club !== null);
-      
-      setClubs(validClubs);
-      console.log("Fetched clubs:", validClubs);
-    } catch (error) {
-      console.error('Error fetching clubs from registry:', error);
-    } finally {
-      setLoading(false);
+        // @ts-expect-error handled
+        const clubIds = registryObject.data?.content?.fields?.clubs || [];
+        const otherClubIds = clubIds.filter((id: string) => id !== ownClubId);
+
+        const clubDataPromises = otherClubIds.map(async (id: string) => {
+          try {
+            const response = await suiClient.getObject({
+              id: id,
+              options: { showContent: true },
+            });
+
+            const clubContent = response.data?.content;
+            if (clubContent) {
+              try {
+                // @ts-expect-error handled
+                const logoBlobId = clubContent.fields?.logo_blob_id;
+                if (logoBlobId) {
+                  const logoUrl = await fetchBlobData(logoBlobId);
+                  return { ...clubContent, logoUrl };
+                }
+              } catch (err) {
+                console.error(`Error fetching logo for club ${id}:`, err);
+              }
+            }
+            return clubContent;
+          } catch (error) {
+            console.error(`Error fetching club ${id}:`, error);
+            return null;
+          }
+        });
+
+        const fetchedClubs = await Promise.all(clubDataPromises);
+        const validClubs = fetchedClubs.filter((club: IClub) => club !== null);
+
+        setClubs(validClubs);
+        console.log("Fetched clubs:", validClubs);
+      } catch (error) {
+        console.error('Error fetching clubs from registry:', error);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
+
+    fetchOtherClubs(clubId);
+
+  }, [clubId, REGISTRY_OBJECT_ID]);
+
+
 
   return (
     <div className="flex flex-col h-screen w-full bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100">
-      
+
       <div className="flex-1 overflow-y-auto p-8">
         <div className="max-w-6xl mx-auto">
           {loading ? (
@@ -111,14 +120,16 @@ export default function CompetitionsPage() {
                 <div key={index} className="bg-gray-800/80 rounded-sm overflow-hidden border border-gray-700 shadow-lg hover:shadow-cyan-500/20 hover:border-cyan-500/50 transition duration-300">
                   <div className="p-6">
                     <div className="flex items-center mb-4">
-                        <div className="rounded-sm overflow-hidden aspect-square">
+                      <div className="rounded-sm overflow-hidden aspect-square">
+                        {club.logoUrl && typeof club.logoUrl === "string" && (
                           <Image src={club.logoUrl} alt="Club logo" width={60} height={60} className="object-contain" />
-                        </div>
+                        )}
+                      </div>
                       <h3 className="text-xl font-bold ml-4 text-cyan-500">
                         {club.fields?.name || "Unknown Club"}
                       </h3>
                     </div>
-                    
+
                     <div className="text-gray-300 text-sm">
                       {club.fields?.location && (
                         <div className="flex items-center mb-2">
@@ -133,7 +144,7 @@ export default function CompetitionsPage() {
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="mt-4 pt-4 border-t border-gray-700 grid grid-cols-2 gap-2">
                       <div className="text-center bg-gray-700/50 p-2 rounded">
                         <div className="text-xs text-gray-400">Played</div>
@@ -152,7 +163,7 @@ export default function CompetitionsPage() {
                         <div className="font-bold text-red-400">{club.fields?.matches_lost || 0}</div>
                       </div>
                     </div>
-                    
+
                     <div className="mt-4 flex justify-between items-center">
                       <div>
                         <span className="text-xs text-gray-500">Goals</span>
