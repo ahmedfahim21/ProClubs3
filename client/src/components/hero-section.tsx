@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import SectionWrapper from './section-wrapper';
+import Link from 'next/link';
 
 const HeroSection = () => {
   return (
@@ -21,13 +22,15 @@ const HeroSection = () => {
         </h1>
         <p className="text-xl md:text-2xl text-muted-cyan-500 mb-10 max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Own Your Football Legacy. A revolutionary football simulation game on the Sui Blockchain.
-          Built with Talus, Walrus, and cutting-edge tech.
+          Built with AI Agents, Walrus, and cutting-edge tech.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
-          <Button size="lg" className="btn bg-cyan-500 hover:bg-cyan-600 font-light text-gray-950 rounded-none text-lg px-8 py-4">
-            Join the Alpha
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <Link href='/init/connect'>
+            <Button size="lg" className="btn bg-cyan-500 hover:bg-cyan-600 font-light text-gray-950 rounded-none text-lg px-8 py-4">
+              Join the Beta
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
           <Button variant="outline" size="lg" className="btn font-light rounded-none text-lg px-8 py-4 border-cyan-500 bg-gray-900 text-cyan-500 hover:text-white hover:bg-cyan-500">
             Learn More
           </Button>

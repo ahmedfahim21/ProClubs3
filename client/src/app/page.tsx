@@ -84,7 +84,7 @@ useEffect(() => {
   }, []);
 
   return (
-    <div className="bg-gray-950 text-cyan-500 min-h-screen text-white">
+    <div className="bg-gray-950 min-h-screen text-white">
       <Navbar />
       <main>
         <HeroSection />
@@ -127,11 +127,11 @@ useEffect(() => {
             ))}
           </div>
            <div className="mt-12 text-center animate-on-scroll">
-            <h3 className="text-2xl font-semibold mb-4">Engagement Points:</h3>
+            <h3 className="text-2xl font-semibold mb-4">Key Strategic Elements:</h3>
             <ul className="list-disc list-inside inline-block text-left text-muted-cyan-500 space-y-2">
-              <li>Strategic decision to host matches (ticket revenue)</li>
-              <li>Competitive play (winning bonuses)</li>
-              <li>Long-term squad management (player transfers, training)</li>
+              <li>Master tactical systems with four distinct playing styles</li>
+              <li>Create dynamic match strategies with realistic player movements</li>
+              <li>Build a sustainable club through smart resource management</li>
             </ul>
           </div>
         </SectionWrapper>

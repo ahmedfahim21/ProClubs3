@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const Navbar = () => {
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-md border-b border-cyan-500/50 shadow-lg transition-all duration-300 ease-in-out">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           <Link href="/" className="flex items-center space-x-2">
@@ -15,7 +15,9 @@ const Navbar = () => {
             <a href="#features" className="text-muted-cyan-500 hover:text-cyan-500 transition-colors">Features</a>
             <a href="#economy" className="text-muted-cyan-500 hover:text-cyan-500 transition-colors">Economy</a>
             <a href="#token" className="text-muted-cyan-500 hover:text-cyan-500 transition-colors">Token</a>
-            <Button className="btn bg-cyan-500 hover:bg-cyan-600 font-light text-gray-950 rounded-none">Join Waitlist</Button>
+            <Link href="/init/connect">
+              <Button className="btn bg-cyan-500 hover:bg-cyan-600 font-light text-gray-950 rounded-none">Join the Beta</Button>
+            </Link>
           </div>
         </div>
       </div>

@@ -12,12 +12,7 @@ const Footer = () => {
         <p className="text-muted-cyan-500 mb-6">
           Revolutionizing football gaming on the blockchain.
         </p>
-        <div className="flex justify-center space-x-6 mb-8">
-          {/* Placeholder for social links */}
-          <a href="#" className="text-muted-cyan-500 hover:text-cyan-500">Twitter</a>
-          <a href="#" className="text-muted-cyan-500 hover:text-cyan-500">Discord</a>
-          <a href="#" className="text-muted-cyan-500 hover:text-cyan-500">Telegram</a>
-        </div>
+
         <p className="text-sm text-muted-cyan-500">
           &copy; {currentYear} ProClubs3. All rights reserved. Built on Sui.
         </p>
