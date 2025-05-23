@@ -5,8 +5,12 @@ import { useWallet } from "@suiet/wallet-kit";
 import { suiClient } from "@/utils/sui-client";
 import { fetchBlobData } from "@/utils/blob";
 import Image from "next/image";
+import { PlayerStatsModal } from "@/components/player-modal";
 
-interface IPlayer {
+export interface IPlayer {
+  id:{
+    id: string;
+  };
   name: string;
   position: string;
   nationality: string;
@@ -163,6 +167,7 @@ export default function SquadPage() {
             <PlayerRow
               key={index}
               index={index}
+              id={player.id}
               position={player.position}
               nationality={player.nationality}
               imageUrl={player.imageUrl}
@@ -190,6 +195,7 @@ export default function SquadPage() {
 
 function PlayerRow({
   index,
+  id,
   position,
   nationality,
   imageUrl,
@@ -260,6 +266,7 @@ function PlayerRow({
       {showModal && (
         <PlayerStatsModal
           player={{
+            id,
             name,
             position,
             nationality,
@@ -277,91 +284,4 @@ function PlayerRow({
       )}
     </>
   )
-}
-
-function PlayerStatsModal({ 
-  player, 
-  onClose 
-}: { 
-  player: IPlayer, 
-  onClose: () => void 
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/70 " onClick={onClose}>
-      <div className="bg-gray-800 border border-gray-700 rounded-lg w-full max-w-md overflow-hidden" onClick={e => e.stopPropagation()}>
-        <div className="p-4 border-b border-gray-700 flex justify-between items-center">
-          <h3 className="text-lg font-medium bg-cyan-500 bg-clip-text text-transparent">
-            PLAYER DETAILS
-          </h3>
-          <button 
-            onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-        
-        <div className="p-5">
-          <div className="flex items-center mb-6">
-            {player.imageUrl ? (
-              <div className="relative w-16 h-16 mr-4 rounded-full overflow-hidden border border-gray-600">
-                <Image src={player.imageUrl} alt={player.name} className="object-cover" fill />
-              </div>
-            ) : (
-              <div className="w-16 h-16 mr-4 bg-gray-700 rounded-full flex items-center justify-center text-2xl">
-                {player.name?.charAt(0) || '?'}
-              </div>
-            )}
-            <div>
-              <h4 className="text-xl font-bold">{player.name}</h4>
-              <div className="flex items-center text-sm text-gray-300">
-                <span className="uppercase font-semibold text-cyan-400 mr-2">{player.position}</span>
-                <span className="mr-2">•</span>
-                <span>{player.nationality}</span>
-                <span className="mx-2">•</span>
-                <span>{player.age} yrs</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <StatBar label="DEFENDING" value={player.defending} />
-            <StatBar label="PASSING" value={player.passing} />
-            <StatBar label="SHOOTING" value={player.shooting} />
-            <StatBar label="DRIBBLING" value={player.dribbling} />
-            <StatBar label="SPEED" value={player.speed} />
-            <StatBar label="PHYSICAL" value={player.physical} />
-          </div>
-          
-          <div className="flex justify-end">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white font-medium transition-colors"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatBar({ label, value }: { label: string, value: number }) {
-  return (
-    <div className="flex flex-col">
-      <div className="flex justify-between mb-1">
-        <span className="text-xs text-gray-400">{label}</span>
-        <span className="text-xs font-bold text-cyan-400">{value}</span>
-      </div>
-      <div className="h-2 bg-gray-700 rounded overflow-hidden">
-        <div 
-          className="h-full bg-cyan-500" 
-          style={{ width: `${value}%` }}
-        ></div>
-      </div>
-    </div>
-  );
 }
