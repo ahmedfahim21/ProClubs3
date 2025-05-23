@@ -107,7 +107,7 @@ export const POSITIONS = {
 
 
 export const FORMATIONS = {
-  "4-2-3-1 Wide": {
+  "4-2-3-1": {
     positions: [
       { x: "center", y: "bottom", role: "GK", duty: "De" },
       { x: "left", y: "defense", role: "FB", duty: "Su" },
@@ -122,7 +122,7 @@ export const FORMATIONS = {
       { x: "center", y: "top", role: "DLF", duty: "Su" },
     ]
   },
-  "4-3-3 Attacking": {
+  "4-3-3": {
     positions: [
       { x: "center", y: "bottom", role: "GK", duty: "De" },
       { x: "left", y: "defense", role: "WB", duty: "At" },
@@ -137,7 +137,7 @@ export const FORMATIONS = {
       { x: "center", y: "top", role: "CF", duty: "At" },
     ]
   },
-  "5-3-2 Counter": {
+  "5-3-2": {
     positions: [
       { x: "center", y: "bottom", role: "GK", duty: "De" },
       { x: "left", y: "defense", role: "WB", duty: "Su" },
@@ -152,7 +152,7 @@ export const FORMATIONS = {
       { x: "center-right", y: "top", role: "AF", duty: "At" },
     ]
   },
-  "4-4-2 Diamond": {
+  "4-4-2": {
     positions: [
       { x: "center", y: "bottom", role: "GK", duty: "De" },
       { x: "left", y: "defense", role: "FB", duty: "De" },

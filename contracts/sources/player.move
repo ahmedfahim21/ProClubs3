@@ -48,4 +48,9 @@ module proclubs3::player {
         transfer::public_transfer(nft, tx_context::sender(ctx));
     }
 
+    /// Function to get the owner of a PlayerNFT
+    public fun get_id(player: &PlayerNFT): &UID {
+        &player.id
+    }
+
 }

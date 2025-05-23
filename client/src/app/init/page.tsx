@@ -32,6 +32,7 @@ export default function ClubCreator() {
 
   const PACKAGE_ID = process.env.NEXT_PUBLIC_PACKAGE_ID || "0x1";
   const REGISTRY_ID = process.env.NEXT_PUBLIC_REGISTRY_OBJECT_ID || "0x1";
+  const MINTER_CAP_ID = process.env.NEXT_PUBLIC_MINTER_CAP_ID || "0x1";
 
   // Create on-chain ClubNFT
   const createClubNFT = async (logoBlobId: string) => {
@@ -60,6 +61,13 @@ export default function ClubCreator() {
           tx.pure.u64(0),
           tx.pure.u64(0),
           tx.pure.u64(0),
+        ]
+      });
+
+      tx.moveCall({
+        target: `${PACKAGE_ID}::procoin::mint_starter_coins`,
+        arguments: [
+          tx.object(MINTER_CAP_ID),
         ]
       });
 

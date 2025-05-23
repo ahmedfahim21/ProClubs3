@@ -1,8 +1,10 @@
 module proclubs3::club {
     use std::string::String;
+    use sui::url;
 
     public struct ClubNFT has key, store {
         id: UID,
+        thumbnail_url: option::Option<url::Url>,
         name: String,
         location: String,
         stadium: String,
@@ -62,6 +64,7 @@ module proclubs3::club {
     ) {
         let nft = ClubNFT {
             id: object::new(ctx),
+            thumbnail_url: option::some(url::new_unsafe_from_bytes(b"https://ahmedfahim.vercel.app/ProCoin.png")),
             name,
             location,
             stadium,
@@ -108,5 +111,10 @@ module proclubs3::club {
     public fun update_tactics(nft: &mut ClubNFT, formation: String, style: String) {
         nft.formation = formation;
         nft.style = style;
+    }
+
+    /// Get the owner of the ClubNFT
+    public fun get_owner(nft: &ClubNFT): address {
+        nft.owner
     }
 }
