@@ -5,7 +5,6 @@ import { useRef, useState, useEffect } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { suiClient } from "@/utils/sui-client";
-import { fetchBlobData } from "@/utils/blob";
 
 interface IClub {
   fields: {
@@ -311,7 +310,7 @@ export default function Home() {
               await new Promise(resolve => setTimeout(resolve, 1000));
               await handleEventAnimation(eventData);
             } catch (e) {
-              // Skip invalid JSON
+              console.error('Error parsing event data:', e);
             }
           }
         }
@@ -325,7 +324,11 @@ export default function Home() {
   return (
     <div className="flex h-[92vh] w-full overflow-auto bg-gray-900 text-gray-100 font-sans">
       <div className="flex-1 flex flex-col">
-        {/* Main Match Area */}
+        { loading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="animate-spin h-8 w-8 border-4 border-cyan-500 border-t-transparent rounded-full"></div>
+          </div>
+        ) : (
         <div className="flex-1 flex h-full">
           {/* Left Panel - Scoreboard and Events */}
           <div className="w-[400px] bg-gray-800 border-r border-gray-700 flex flex-col">
@@ -374,7 +377,7 @@ export default function Home() {
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-semibold text-cyan-400">{event.minute}'</span>
+                          <span className="font-semibold text-cyan-400">{event.minute}&apos;</span>
                           <span className="text-sm bg-gray-700 px-2 py-1 rounded text-gray-200 capitalize">
                             {event.type}
                           </span>
@@ -437,6 +440,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

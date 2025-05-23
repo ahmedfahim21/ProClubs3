@@ -81,7 +81,7 @@ Start the simulation now:
               const parsed = JSON.parse(trimmed);
               controller.enqueue(encoder.encode(`data: ${JSON.stringify(parsed)}\n\n`));
             } catch (err) {
-              console.warn("Malformed JSON line:", trimmed);
+              console.warn("Malformed JSON line:", trimmed, err);
             }
           }
           controller.close();

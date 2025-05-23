@@ -2,14 +2,12 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Twitter, Instagram, Facebook, MessageSquare, Heart, CheckCircle } from "lucide-react"
-import Image from "next/image"
 
 interface SocialCardProps {
   platform: "twitter" | "instagram" | "facebook" | "expert"
   author: string
   content: string
   date: string
-  imageUrl?: string
   likes?: number
   comments?: number
   verified?: boolean
@@ -21,7 +19,6 @@ export function SocialCard({
   author,
   content,
   date,
-  imageUrl,
   likes,
   comments,
   verified = false,
@@ -76,11 +73,6 @@ export function SocialCard({
       </CardHeader>
       <CardContent className="pb-2">
         <p className="text-sm text-gray-200">{content}</p>
-        {imageUrl && (
-          <div className="mt-3 rounded-md overflow-hidden">
-            <Image src={imageUrl || "/placeholder.webp"} alt="Social media post" className="w-full h-auto" width={500} height={300} />
-          </div>
-        )}
       </CardContent>
       <CardFooter className="flex justify-between pt-2">
         <div className="text-xs text-gray-400">{date}</div>

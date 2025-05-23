@@ -62,6 +62,7 @@ export default function TransfersPage() {
           const content = obj.data?.content;
           if (!content) continue;
 
+          // @ts-expect-error handled
           const { type, fields } = content;
 
           if (type.includes("::player::PlayerNFT")) {
@@ -86,7 +87,7 @@ export default function TransfersPage() {
     }
 
     fetchListings();
-  }, [KIOSK_ID]);
+  }, []);
 
   return (
     <div className="flex flex-col h-full w-full bg-gray-950 text-gray-100 font-sans p-6 gap-6">

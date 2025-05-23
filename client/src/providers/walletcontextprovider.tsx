@@ -9,5 +9,6 @@ export default function WalletContextProvider({
 }: {
   children: React.ReactNode;
 }) {
+  // @ts-expect-error handled
   return <WalletProvider>{children}</WalletProvider>;
 }

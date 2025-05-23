@@ -2,171 +2,294 @@
 
 import { NewsCard } from "@/components/news-card"
 import { SocialCard } from "@/components/social-card"
+import { useEffect, useState } from "react"
+import { RefreshCw } from "lucide-react"
+import { suiClient } from "@/utils/sui-client"
+
+interface Content {
+  twitter: {
+    author: string
+    content: string
+    date: string
+    likes: number
+    comments: number
+  }
+  instagram: {
+    author: string
+    content: string
+    date: string
+    likes: number
+    comments: number
+  }
+  playerTweet: {
+    author: string
+    content: string
+    date: string
+    likes: number
+    comments: number
+  }
+  news1: {
+    title: string
+    excerpt: string
+    date: string
+  }
+  facebook: {
+    author: string
+    content: string
+    date: string
+    likes: number
+    comments: number
+  }
+  expert: {
+    author: string
+    content: string
+    date: string
+    source: string
+  }
+  news2: {
+    title: string
+    excerpt: string
+    date: string
+  }
+}
+
+interface ClubData {
+  name: string
+  location: string
+  stadium: string
+  formation: string
+  style: string
+  matches_played: number
+  matches_won: number
+  matches_drawn: number
+  matches_lost: number
+  goals_scored: number
+  goals_conceded: number
+}
 
 export function ClubDashboard() {
+  const [content, setContent] = useState<Content | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [clubData, setClubData] = useState<ClubData | null>(null)
+
+  const fetchClubData = async () => {
+    try {
+      const clubId = localStorage.getItem("clubId")
+      if (!clubId) {
+        throw new Error("No club ID found")
+      }
+
+      const response = await suiClient.getObject({
+        id: clubId,
+        options: { showContent: true },
+      })
+
+      if (!response.data?.content || !('fields' in response.data.content)) {
+        throw new Error("Invalid club data")
+      }
+
+      const fields = response.data.content.fields as any
+      return {
+        name: fields.name,
+        location: fields.location,
+        stadium: fields.stadium,
+        formation: fields.formation,
+        style: fields.style,
+        matches_played: parseInt(fields.matches_played),
+        matches_won: parseInt(fields.matches_won),
+        matches_drawn: parseInt(fields.matches_drawn),
+        matches_lost: parseInt(fields.matches_lost),
+        goals_scored: parseInt(fields.goals_scored),
+        goals_conceded: parseInt(fields.goals_conceded)
+      }
+    } catch (err) {
+      console.error("Error fetching club data:", err)
+      throw err
+    }
+  }
+
+  const fetchContent = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      
+      // Fetch club data first
+      let currentClubData = clubData
+      if (!currentClubData) {
+        try {
+          currentClubData = await fetchClubData()
+          setClubData(currentClubData)
+        } catch (err) {
+          throw new Error("Failed to fetch club data: " + (err instanceof Error ? err.message : "Unknown error"))
+        }
+      }
+
+      if (!currentClubData) {
+        throw new Error("No club data available")
+      }
+
+      console.log("Using club data:", currentClubData)
+
+      const response = await fetch('/api/fetch-content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ clubData: currentClubData }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch content')
+      }
+
+      const data = await response.json()
+      setContent(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchContent()
+  }, [])
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cyan-500"></div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center py-8 text-red-500 bg-red-500/10 rounded-lg px-6">
+          <p className="text-lg font-semibold mb-2">Error Loading Content</p>
+          <p>{error}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!content) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center py-8 text-gray-400 bg-gray-800/50 rounded-lg px-6">
+          <p className="text-lg font-semibold">No Content Available</p>
+          <p className="text-sm mt-2">Try refreshing the page</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold">Latest Updates</h2>
+    <div className="space-y-8">
+      {/* Header Section */}
+      <div className="flex items-center justify-between bg-gray-800/50 p-6 rounded-lg border border-gray-700">
+        <div>
+          <h2 className="text-2xl font-semibold text-white mb-2">Latest Updates</h2>
+          <p className="text-gray-400 text-sm">Stay updated with the latest news and social media activity</p>
+        </div>
+        <button
+          onClick={fetchContent}
+          className="flex items-center gap-2 px-6 py-3 bg-cyan-600 text-white rounded-lg hover:bg-cyan-700 transition-colors shadow-lg hover:shadow-cyan-500/20"
+        >
+          <RefreshCw className="w-5 h-5" />
+          Refresh Content
+        </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 auto-rows-auto">
-        {/* Featured News - Large */}
-        <div className="md:col-span-2 md:row-span-2">
-          <NewsCard
-            title="Club Signs Star Striker in Record Deal"
-            excerpt="FC United has completed the signing of international striker Alex Johnson in a club-record £45 million deal from Atletico Madrid. The 27-year-old forward joins on a five-year contract after scoring 24 goals in La Liga last season."
-            category="Transfer News"
-            date="2 hours ago"
-            imageUrl="/placeholder.webp?height=400&width=600"
-            featured
-          />
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-12 gap-6">
+        {/* Left Column - Social Media */}
+        <div className="col-span-12 lg:col-span-8 space-y-6">
+          {/* Twitter Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700 hover:border-cyan-500/50 transition-colors">
+              <SocialCard
+                platform="twitter"
+                author={content.twitter.author}
+                content={content.twitter.content}
+                date={content.twitter.date}
+                likes={content.twitter.likes}
+                comments={content.twitter.comments}
+                verified
+              />
+            </div>
+            <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700 hover:border-cyan-500/50 transition-colors">
+              <SocialCard
+                platform="twitter"
+                author={content.playerTweet.author}
+                content={content.playerTweet.content}
+                date={content.playerTweet.date}
+                likes={content.playerTweet.likes}
+                comments={content.playerTweet.comments}
+                verified
+              />
+            </div>
+          </div>
+
+          {/* News Section */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700 hover:border-cyan-500/50 transition-colors">
+              <NewsCard
+                title={content.news1.title}
+                excerpt={content.news1.excerpt}
+                date={content.news1.date}
+              />
+            </div>
+            <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700 hover:border-cyan-500/50 transition-colors">
+              <NewsCard
+                title={content.news2.title}
+                excerpt={content.news2.excerpt}
+                date={content.news2.date}
+              />
+            </div>
+          </div>
+
+          {/* Expert Analysis */}
+          <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700 hover:border-cyan-500/50 transition-colors">
+            <SocialCard
+              platform="expert"
+              author={content.expert.author}
+              content={content.expert.content}
+              date={content.expert.date}
+              source={content.expert.source}
+              verified
+            />
+          </div>
         </div>
 
+        {/* Right Column - Social Media */}
+        <div className="col-span-12 lg:col-span-4 space-y-6">
+          {/* Instagram Card */}
+          <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700 hover:border-cyan-500/50 transition-colors">
+            <SocialCard
+              platform="instagram"
+              author={content.instagram.author}
+              content={content.instagram.content}
+              date={content.instagram.date}
+              likes={content.instagram.likes}
+              comments={content.instagram.comments}
+              verified
+            />
+          </div>
 
-        {/* Twitter Card */}
-        <div className="md:col-span-1 md:row-span-1">
-          <SocialCard
-            platform="twitter"
-            author="@FCUnited"
-            content="Incredible atmosphere at training today! The team is focused and ready for Saturday's big match. #FCUCR #WeAreUnited"
-            date="3 hours ago"
-            likes={1243}
-            comments={89}
-            verified
-          />
-        </div>
-
-        {/* News Card */}
-        <div className="md:col-span-1 md:row-span-1">
-          <NewsCard
-            title="Youth Academy Graduate Scores on Debut"
-            excerpt="18-year-old James Wilson scored in his first-team debut yesterday."
-            category="Match Report"
-            date="1 day ago"
-          />
-        </div>
-
-        {/* Instagram Card */}
-        <div className="md:col-span-1 md:row-span-1">
-          <SocialCard
-            platform="instagram"
-            author="@fcunited_official"
-            content="New kit drop! 🔥 Our away kit for the 2023/24 season is now available in stores and online."
-            date="5 hours ago"
-            imageUrl="/placeholder.webp?height=300&width=300"
-            likes={8752}
-            comments={342}
-            verified
-          />
-        </div>
-
-
-        {/* Player Tweet */}
-        <div className="md:col-span-1 md:row-span-1">
-          <SocialCard
-            platform="twitter"
-            author="@alex_johnson9"
-            content="So excited to join @FCUnited! Can't wait to meet the fans and give everything for this historic club. Let's make history together! #NewBeginnings"
-            date="1 day ago"
-            likes={24567}
-            comments={1832}
-            verified
-          />
-        </div>
-
-        {/* News Card with Image */}
-        <div className="md:col-span-2 md:row-span-1">
-          <NewsCard
-            title="Stadium Expansion Plans Approved"
-            excerpt="The city council has approved plans to expand United Stadium capacity to 60,000 seats. Construction will begin next summer."
-            category="Club News"
-            date="2 days ago"
-            imageUrl="/placeholder.webp?height=200&width=400"
-          />
-        </div>
-
-        {/* Fan Comment */}
-        <div className="md:col-span-1 md:row-span-1">
-          <SocialCard
-            platform="facebook"
-            author="Sarah Johnson"
-            content="Been a fan for 25 years and this is the most exciting team we've had in a decade! Can't wait for Saturday's match!"
-            date="12 hours ago"
-            likes={423}
-            comments={51}
-          />
-        </div>
-
-        {/* Pundit Comment */}
-        <div className="md:col-span-2 md:row-span-1">
-          <SocialCard
-            platform="expert"
-            author="Gary Neville"
-            content="FC United's pressing game has improved dramatically under the new manager. Their ability to win the ball high up the pitch is creating so many chances. They're genuine title contenders this season."
-            date="1 day ago"
-            source="Monday Night Football"
-            verified
-          />
-        </div>
-
-        {/* News Card */}
-        <div className="md:col-span-1 md:row-span-1">
-          <NewsCard
-            title="Manager Signs Contract Extension"
-            excerpt="FC United manager David Miller has signed a three-year contract extension, keeping him at the club until 2026."
-            category="Club News"
-            date="3 days ago"
-          />
-        </div>
-
-        {/* Twitter Rumor */}
-        <div className="md:col-span-1 md:row-span-1">
-          <SocialCard
-            platform="twitter"
-            author="@FootballInsider"
-            content="Sources tell us FC United is looking at strengthening their defensive options in January. Several center-backs being monitored. #TransferNews"
-            date="2 days ago"
-            likes={876}
-            comments={124}
-          />
-        </div>
-
-        {/* News Card with Image */}
-        <div className="md:col-span-2 md:row-span-1">
-          <NewsCard
-            title="Injury Update: Captain Returns to Training"
-            excerpt="Club captain Michael Roberts has returned to full training after recovering from a hamstring injury that kept him sidelined for three weeks."
-            category="Team News"
-            date="4 days ago"
-            imageUrl="/placeholder.webp?height=200&width=400"
-          />
-        </div>
-
-        {/* Instagram Post from Player */}
-        <div className="md:col-span-1 md:row-span-1">
-          <SocialCard
-            platform="instagram"
-            author="@alex_johnson9"
-            content="First day at the new training ground! Amazing facilities here at @FCUnited 🔴⚪️"
-            date="1 day ago"
-            imageUrl="/placeholder.webp?height=300&width=300"
-            likes={15432}
-            comments={876}
-            verified
-          />
-        </div>
-
-        {/* Fan Comment */}
-        <div className="md:col-span-1 md:row-span-1">
-          <SocialCard
-            platform="twitter"
-            author="@UnitedFanatic"
-            content="That new signing looks incredible! Johnson is exactly what we needed up front. This season is going to be special! #FCUnited"
-            date="1 day ago"
-            likes={342}
-            comments={28}
-          />
+          {/* Facebook Comment */}
+          <div className="bg-gray-800/50 p-6 rounded-lg border border-gray-700 hover:border-cyan-500/50 transition-colors">
+            <SocialCard
+              platform="facebook"
+              author={content.facebook.author}
+              content={content.facebook.content}
+              date={content.facebook.date}
+              likes={content.facebook.likes}
+              comments={content.facebook.comments}
+            />
+          </div>
         </div>
       </div>
     </div>
