@@ -255,25 +255,3 @@ export const PLAYING_STYLES = {
     ]
   }
 };
-
-
-export const PLAYERS = [
-  { number: "24", name: "André Onana", position: "GK", stars: 4 },
-  { number: "12", name: "N. Mazraoui", position: "DR", rstars: 3 },
-  { number: "5", name: "Daley Blind", position: "DCR", rstars: 3 },
-  { number: "17", name: "Joël Veltman", position: "DCL", rstars: 3 },
-  { number: "3", name: "N. Tagliafico", position: "DL", stars: 4 },
-  { number: "6", name: "D. van de Beek", position: "MCR", rstars: 4 },
-  { number: "8", name: "Edson Álvarez", position: "MCL", rstars: 3 },
-  { number: "20", name: "R. Gravenberch", position: "AMC", stars: 2 },
-  { number: "7", name: "David Neres", position: "AMR", stars: 3 },
-  { number: "22", name: "Hakim Ziyech", position: "AMC", stars: 4 },
-  { number: "11", name: "Q. Promes", position: "AML", stars: 4 },
-  { number: "10", name: "Dusan Tadic", position: "STC", rstars: 4 },
-  { number: "15", name: "Sergiño Dest", position: "DR", stars: 3 },
-  { number: "4", name: "Perr Schuurs", position: "DC", stars: 3 },
-  { number: "23", name: "Z. Labyad", position: "AMC", stars: 2 },
-  { number: "21", name: "Lisandro Martinez", position: "DM", stars: 3 },
-  { number: "9", name: "K. Huntelaar", position: "ST", stars: 3 },
-  { number: "1", name: "B. Varela", position: "GK", stars: 2 },
-];

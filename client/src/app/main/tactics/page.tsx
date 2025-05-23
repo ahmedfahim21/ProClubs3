@@ -5,28 +5,24 @@ import {
   ChevronDown,
   Save,
   Check,
-  RotateCcw,
-  GripVertical
+  RotateCcw
 } from "lucide-react"
-import { FORMATIONS, PLAYING_STYLES, PLAYERS } from "@/utils/constants";
+import { FORMATIONS, PLAYING_STYLES } from "@/utils/constants";
 import { Transaction } from "@mysten/sui/transactions";
 import { useSuiClient, useWallet } from "@suiet/wallet-kit";
 
+type FormationType = keyof typeof FORMATIONS;
+type PlayingStyleType = keyof typeof PLAYING_STYLES;
+
 export default function FootballManager() {
-  // State for selected formation and playing style
-  const [formation, setFormation] = useState("4-2-3-1 Wide");
-  const [playingStyle, setPlayingStyle] = useState("Gegenpress");
+
+  const [formation, setFormation] = useState<FormationType>("4-2-3-1" as FormationType);
+  const [playingStyle, setPlayingStyle] = useState<PlayingStyleType>("Gegenpress" as PlayingStyleType);
   const [showFormationDropdown, setShowFormationDropdown] = useState(false);
   const [showStyleDropdown, setShowStyleDropdown] = useState(false);
   const [unsavedChanges, setUnsavedChanges] = useState(false);
   const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
   const { address } = useWallet();
-
-  // Player swap functionality
-  const [players, setPlayers] = useState(PLAYERS);
-  const [draggedPlayerIndex, setDraggedPlayerIndex] = useState(null);
-  const [dragOverPlayerIndex, setDragOverPlayerIndex] = useState(null);
-
   const [clubId, setClubId] = useState<string | null>(null);
   const { signTransaction } = useWallet();
   const suiClient = useSuiClient();
@@ -39,49 +35,14 @@ export default function FootballManager() {
     }
   }, []);
 
-  // Get the positions for the current formation
   const currentFormationPositions = FORMATIONS[formation].positions;
   const currentStyle = PLAYING_STYLES[playingStyle];
 
-  // Player drag and drop handlers
-  const handleDragStart = (index) => {
-    setDraggedPlayerIndex(index);
-  };
-
-  const handleDragOver = (e, index) => {
-    e.preventDefault();
-    setDragOverPlayerIndex(index);
-  };
-
-  const handleDrop = (e, index) => {
-    e.preventDefault();
-
-    if (draggedPlayerIndex === null) return;
-
-    // Create a new array with the players in the new order
-    const newPlayers = [...players];
-    const draggedPlayer = newPlayers[draggedPlayerIndex];
-
-    // Remove the dragged player from the array
-    newPlayers.splice(draggedPlayerIndex, 1);
-
-    // Insert the dragged player at the new position
-    newPlayers.splice(index, 0, draggedPlayer);
-
-    // Update the state
-    setPlayers(newPlayers);
-    setDraggedPlayerIndex(null);
-    setDragOverPlayerIndex(null);
-    setUnsavedChanges(true);
-  };
-
-  const handleDragEnd = () => {
-    setDraggedPlayerIndex(null);
-    setDragOverPlayerIndex(null);
-  };
+  type XPosition = "left" | "left-center" | "center-left" | "center" | "center-right" | "right-center" | "right";
+  type YPosition = "bottom" | "defense" | "def-mid" | "midfield" | "attack-mid" | "attack" | "top";
 
   // Helper function to map position coordinates to actual CSS classes
-  const getPositionClasses = (x, y) => {
+  const getPositionClasses = (x: XPosition, y: YPosition) => {
     const xClasses = {
       "left": "left-[10%]",
       "left-center": "left-[20%]",
@@ -148,8 +109,6 @@ export default function FootballManager() {
 
   }
 
-
-
   return (
     <div className="flex h-[92vh] w-full overflow-auto bg-gray-900 text-gray-100 font-sans">
       {/* Main Content */}
@@ -157,7 +116,7 @@ export default function FootballManager() {
         {/* Main Tactics Area */}
         <div className="flex-1 flex h-full">
           {/* Left Tactics Panel */}
-          <div className="w-[300px] bg-gray-800 border-r border-gray-700 flex flex-col p-4">
+          <div className="w-[500px] bg-gray-800 border-r border-gray-700 flex flex-col p-4">
             <div className="flex items-center justify-between mb-6">
               <div className="text-xl font-medium bg-cyan-500 bg-clip-text text-transparent">TACTICS</div>
               <div className="relative">
@@ -176,7 +135,7 @@ export default function FootballManager() {
                         key={form}
                         className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors flex items-center"
                         onClick={() => {
-                          setFormation(form);
+                          setFormation(form as FormationType);
                           setShowFormationDropdown(false);
                           setUnsavedChanges(true);
                         }}
@@ -208,7 +167,7 @@ export default function FootballManager() {
                           key={style}
                           className="w-full text-left px-4 py-2 hover:bg-gray-700 transition-colors flex items-center"
                           onClick={() => {
-                            setPlayingStyle(style);
+                            setPlayingStyle(style as PlayingStyleType);
                             setShowStyleDropdown(false);
                             setUnsavedChanges(true);
                           }}
@@ -235,7 +194,7 @@ export default function FootballManager() {
                   <div className="text-sm font-medium">POSSESSION</div>
                 </div>
                 <div className="pl-3 text-xs space-y-1 text-gray-300">
-                  {currentStyle.possession.map((item, index) => (
+                  {currentStyle.possession.map((item, index: number) => (
                     <div key={`possession-${index}`}>• {item}</div>
                   ))}
                 </div>
@@ -246,7 +205,7 @@ export default function FootballManager() {
                   <div className="text-sm font-medium">TRANSITION</div>
                 </div>
                 <div className="pl-3 text-xs space-y-1 text-gray-300">
-                  {currentStyle.transition.map((item, index) => (
+                  {currentStyle.transition.map((item, index: number) => (
                     <div key={`transition-${index}`}>• {item}</div>
                   ))}
                 </div>
@@ -277,9 +236,8 @@ export default function FootballManager() {
                 <button
                   className="text-sm bg-gray-700 hover:bg-gray-600 transition-colors px-3 py-1 rounded flex items-center"
                   onClick={() => {
-                    setFormation("4-2-3-1 Wide");
+                    setFormation("4-2-3-1");
                     setPlayingStyle("Gegenpress");
-                    setPlayers(PLAYERS);
                     setUnsavedChanges(true);
                   }}
                 >
@@ -307,64 +265,6 @@ export default function FootballManager() {
             </div>
           </div>
 
-
-          {/* Middle Pitch View */}
-          <div className="w-[500px] bg-gray-800 border-l border-gray-700 flex flex-col">
-            <div className="p-3 border-b border-gray-700 flex justify-between items-center">
-              <div className="text-lg font-medium bg-cyan-500 bg-clip-text text-transparent">SQUAD</div>
-              <div className="text-xs text-gray-400">Drag to reorder players</div>
-            </div>
-
-            <div className="flex text-xs p-3 border-b border-gray-700 bg-gray-900">
-              <div className="w-4"></div>
-              <div className="w-10 text-center">#</div>
-              <div className="w-[70px]">POS</div>
-              <div className="flex-1">PLAYER</div>
-              <div className="w-14">RATING</div>
-            </div>
-
-            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700">
-              {players.slice(0, 11).map((player, index) => (
-                <ModernPlayerRow
-                  key={`player-${index}`}
-                  index={index}
-                  number={player.number}
-                  position={player.position}
-                  stars={player.stars}
-                  name={player.name}
-                  isStarter={true}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                  onDragEnd={handleDragEnd}
-                  isDragging={index === draggedPlayerIndex}
-                  isDragOver={index === dragOverPlayerIndex}
-                />
-              ))}
-
-              <div className="mt-2 px-3 py-2 bg-gray-900 text-sm font-medium">SUBSTITUTES & RESERVES</div>
-
-              {players.slice(11).map((player, index) => (
-                <ModernPlayerRow
-                  key={`sub-${index}`}
-                  index={index + 11}
-                  number={player.number}
-                  position={player.position}
-                  stars={player.stars}
-                  name={player.name}
-                  isStarter={false}
-                  onDragStart={handleDragStart}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                  onDragEnd={handleDragEnd}
-                  isDragging={index + 11 === draggedPlayerIndex}
-                  isDragOver={index + 11 === dragOverPlayerIndex}
-                />
-              ))}
-            </div>
-          </div>
-
-
           {/* Right Player Panel */}
           <div className="flex-1 bg-green-900 relative overflow-hidden h-full m-2 my-auto">
 
@@ -391,16 +291,12 @@ export default function FootballManager() {
             {/* Player positions */}
             <div className="h-full relative z-10">
               {currentFormationPositions.map((pos, index) => {
-                const player = players[index] || { number: '?', name: 'Unknown', role: 'NA', duty: 'Su' };
                 return (
                   <div
                     key={`position-${index}`}
-                    className={`absolute ${getPositionClasses(pos.x, pos.y)}`}
+                    className={`absolute ${getPositionClasses(pos.x as XPosition, pos.y as YPosition)}`}
                   >
                     <PlayerPosition
-                      number={player.number}
-                      position={player.position}
-                      name={player.name}
                     />
                   </div>
                 );
@@ -413,7 +309,7 @@ export default function FootballManager() {
   )
 }
 
-function getMentalityColor(mentality) {
+function getMentalityColor(mentality: string) {
   switch (mentality) {
     case "Very Defensive": return "bg-blue-800";
     case "Defensive": return "bg-blue-600";
@@ -426,65 +322,14 @@ function getMentalityColor(mentality) {
   }
 }
 
-function PlayerPosition({ number, position, name }) {
+function PlayerPosition() {
   return (
     <div className="group">
       <div className="relative mx-auto justify-center items-center flex">
         <div className="w-12 h-12 bg-gray-800 bg-opacity-80 backdrop-blur-sm rounded-full border-2 border-white flex items-center justify-center text-white font-bold transform transition-transform group-hover:scale-110">
-          {number}
         </div>
       </div>
       <div className="mt-1 text-white text-xs px-2 py-1 text-center bg-black bg-opacity-70 backdrop-blur-sm rounded-md invisible group-hover:visible transition-opacity">
-        <div className="font-bold">{name}</div>
-        <div className="text-gray-400 text-xs">{position}</div>
-      </div>
-    </div>
-  )
-}
-
-export function ModernPlayerRow({
-  index,
-  number,
-  position,
-  stars,
-  name,
-  isStarter,
-  onDragStart,
-  onDragOver,
-  onDrop,
-  onDragEnd,
-  isDragging,
-  isDragOver
-}) {
-  return (
-    <div
-      className={`flex items-center text-sm py-2 px-3 border-b border-gray-700 hover:bg-gray-700 transition-colors cursor-move
-        ${isStarter ? '' : 'opacity-80'}
-        ${isDragging ? 'opacity-50 bg-gray-600' : ''}
-        ${isDragOver ? 'border-t-2 border-cyan-400' : ''}
-      `}
-      draggable={true}
-      onDragStart={() => onDragStart(index)}
-      onDragOver={(e) => onDragOver(e, index)}
-      onDrop={(e) => onDrop(e, index)}
-      onDragEnd={onDragEnd}
-    >
-      <div className="w-4 mr-1 text-gray-500 flex items-center">
-        <GripVertical size={14} />
-      </div>
-      <div className="w-8 text-right mr-2 font-medium text-sm">{number}</div>
-      <div className="w-[70px] text-gray-400 text-sm">{position}</div>
-      <div className="w-66 flex items-center">
-        {name}
-      </div>
-      <div className="w-10 flex">
-        {Array(5)
-          .fill(0)
-          .map((_, i) => (
-            <div key={i} className={i < stars ? "text-cyan-300" : "text-gray-600"}>
-              ★
-            </div>
-          ))}
       </div>
     </div>
   )
