@@ -6,6 +6,7 @@ import { suiClient } from "@/utils/sui-client";
 import { BuildingIcon, LocationEdit } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface IClub {
   fields: {
@@ -18,11 +19,31 @@ interface IClub {
     matches_lost: number;
     goals_scored: number;
     goals_conceded: number;
+    primary_color: string;
+    secondary_color: string;
   };
   logoUrl?: string;
+  id?: string;
 }
 
+const AIClub = {
+  fields: {
+    name: "ProCoins FC",
+    location: "AI Realm",
+    stadium: "AI Arena",
+    matches_played: 100,
+    matches_won: 50,
+    matches_drawn: 0,
+    matches_lost: 50,
+    goals_scored: 50,
+    goals_conceded: 50,
+  },
+  logoUrl: "https://ahmedfahim.vercel.app/ProCoin.png",
+  id: "0x1",
+};
+
 export default function CompetitionsPage() {
+  const router = useRouter();
   const REGISTRY_OBJECT_ID = process.env.NEXT_PUBLIC_REGISTRY_OBJECT_ID || "0x1";
   const [clubs, setClubs] = useState<IClub[]>([]);
   const [clubId, setClubId] = useState<string | null>(null);
@@ -69,7 +90,7 @@ export default function CompetitionsPage() {
                 const logoBlobId = clubContent.fields?.logo_blob_id;
                 if (logoBlobId) {
                   const logoUrl = await fetchBlobData(logoBlobId);
-                  return { ...clubContent, logoUrl };
+                  return { ...clubContent, logoUrl , id };
                 }
               } catch (err) {
                 console.error(`Error fetching logo for club ${id}:`, err);
@@ -85,8 +106,8 @@ export default function CompetitionsPage() {
         const fetchedClubs = await Promise.all(clubDataPromises);
         const validClubs = fetchedClubs.filter((club: IClub) => club !== null);
 
-        setClubs(validClubs);
-        console.log("Fetched clubs:", validClubs);
+        setClubs([...validClubs, AIClub]);
+        console.log("Fetched clubs:", validClubs, fetchedClubs);
       } catch (error) {
         console.error('Error fetching clubs from registry:', error);
       } finally {
@@ -98,7 +119,10 @@ export default function CompetitionsPage() {
 
   }, [clubId, REGISTRY_OBJECT_ID]);
 
-
+  const handleChallenge = (challengedClub: IClub) => {
+    if (!challengedClub.id) return;
+    router.push(`/main/matches/match?challengedClub=${challengedClub.id}`);
+  };
 
   return (
     <div className="flex flex-col h-screen w-full bg-gradient-to-b from-gray-900 to-gray-800 text-gray-100">
@@ -173,7 +197,10 @@ export default function CompetitionsPage() {
                           <span className="text-red-400 font-medium">{club.fields?.goals_conceded || 0}</span>
                         </div>
                       </div>
-                      <Button className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-none text-sm font-medium transition-colors duration-200">
+                      <Button 
+                        className="px-4 py-2 bg-cyan-500 hover:bg-cyan-600 rounded-none text-sm font-medium transition-colors duration-200"
+                        onClick={() => handleChallenge(club)}
+                      >
                         Challenge
                       </Button>
                     </div>

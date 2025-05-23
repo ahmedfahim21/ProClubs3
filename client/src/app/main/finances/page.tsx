@@ -36,16 +36,10 @@ export default function FinancesPage() {
     fetchBalances(address || "");
   }, [address, PACKAGE_ID]);
 
-  // Helper function to format large numbers
   const formatDisplayBalance = (balance: string) => {
-    const num = parseInt(balance);
-    if (num >= 1000000000) {
-      return (num / 1000000000).toFixed(2) + " B";
-    } else if (num >= 1000000) {
-      return (num / 1000000).toFixed(2) + " M";
-    } else if (num >= 1000) {
-      return (num / 1000).toFixed(2) + " K";
-    }
+    let num = parseInt(balance);
+    num = num / 1e9; 
+    num = Math.round(num * 100) / 100;
     return num.toString();
   };
 
@@ -76,7 +70,7 @@ export default function FinancesPage() {
                   height={48}
                 />
               </div>
-              <h2 className="text-xl font-semibold text-white">SUI Token</h2>
+              <h2 className="text-xl font-semibold text-white">SUI</h2>
             </div>
             <p className="text-3xl font-bold mb-2 text-cyan-500">{formatDisplayBalance(suiBalance)}</p>
             <p className="text-sm text-gray-400">Exact: {suiBalance}</p>
