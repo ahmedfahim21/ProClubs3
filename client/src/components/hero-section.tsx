@@ -22,7 +22,7 @@ const HeroSection = () => {
           <span className='text-white'>3</span>
         </h1>
         <p className="text-xl md:text-2xl text-muted-cyan-500 mb-10 max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
-          Own Your Football Legacy. A revolutionary football simulation game on the Sui Blockchain.
+          Own Your Football Legacy. A revolutionary football manager simulation game on the Sui Blockchain.
           Built with AI Agents, Walrus, and cutting-edge tech.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>

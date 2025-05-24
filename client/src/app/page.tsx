@@ -7,6 +7,7 @@ import Navbar from '@/components/landing-navbar';
 import SectionWrapper from '@/components/section-wrapper';
 import { Button } from '@/components/ui/button';
 import { Users, ShieldCheck, BarChart3, Coins, Play, Settings, Plus, X, CircleDollarSign, ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 import React, { useEffect } from 'react';
 
 const coreFeatures = [
@@ -22,8 +23,8 @@ const coreFeatures = [
   },
   {
     icon: BarChart3,
-    title: "Fair Match Simulation with Talus",
-    description: "Experience transparent and verifiable match outcomes powered by Talus for off-chain computation.",
+    title: "Fair Match Simulation with AI",
+    description: "Experience transparent and verifiable match outcomes powered by AI off-chain computation.",
   },
 ];
 
@@ -161,10 +162,12 @@ useEffect(() => {
             <p className="text-lg text-cyan-100 mb-8 max-w-2xl mx-auto">
               Join the ProClubs3 community and be among the first to experience the future of football gaming.
             </p>
-            <Button size="lg" className=" bg-gray-900 text-cyan-500 hover:bg-gray-200 rounded-none text-lg font-light px-10 py-4">
-              Sign Up for Updates
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
+            <Link href="https://x.com/ProClubs_3">
+              <Button size="lg" className=" bg-gray-900 text-cyan-500 hover:bg-gray-200 rounded-none text-lg font-light px-10 py-4">
+                Sign Up for Updates
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
           </div>
         </SectionWrapper>
 
