@@ -36,6 +36,8 @@ ProClubs3 is a decentralized football management game where users create clubs, 
 
 ## 🧠 Tech Stack
 
+![image](https://github.com/user-attachments/assets/b8b0dba9-2f42-4de1-8675-80348ea8c2a0)
+
 | Layer | Tool |
 |------|------|
 | Blockchain | [Sui](https://sui.io) |
@@ -45,6 +47,13 @@ ProClubs3 is a decentralized football management game where users create clubs, 
 | Frontend | NextJS + Tailwind CSS + ShadCN |=
 
 ---
+
+## Screenshots
+
+<img width="1512" alt="image" src="https://github.com/user-attachments/assets/333b87ff-e104-4ecb-b38e-5b5d7f1a2aac" />
+
+<img width="1512" alt="image" src="https://github.com/user-attachments/assets/1764539e-c190-4848-8a0a-f63b1bf6e0e2" />
+
 
 ## 🛠️ Setup Instructions
 
