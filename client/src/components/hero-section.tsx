@@ -18,7 +18,8 @@ const HeroSection = () => {
       {/* Content Wrapper */}
       <div className="relative z-10 flex flex-col justify-center items-center w-full">
         <h1 className="text-5xl md:text-7xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-cyan-600 animate-fade-in-up">
-          ProClubs3
+          ProClubs
+          <span className='text-white'>3</span>
         </h1>
         <p className="text-xl md:text-2xl text-muted-cyan-500 mb-10 max-w-3xl mx-auto animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
           Own Your Football Legacy. A revolutionary football simulation game on the Sui Blockchain.

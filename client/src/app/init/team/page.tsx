@@ -113,9 +113,9 @@ export default function FootballPlayerGenerator() {
             const newPlayers = [];
 
             const targetPositions = {
-                "GK": 0,  // 2 goalkeepers
-                "DEF": 0, // 5 defenders
-                "MID": 0, // 6 midfielders
+                "GK": 1,  // 2 goalkeepers
+                "DEF": 4, // 5 defenders
+                "MID": 3, // 6 midfielders
                 "FWD": 3  // 3 forwards
             };
 
