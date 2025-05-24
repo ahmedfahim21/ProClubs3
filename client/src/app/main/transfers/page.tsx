@@ -91,7 +91,7 @@ export default function TransfersPage() {
 
   return (
     <div className="flex flex-col h-full w-full bg-gray-950 text-gray-100 font-sans p-6 gap-6">
-      <h1 className="text-3xl font-bold text-cyan-500">Transfers</h1>
+      <h1 className="text-3xl font-bold text-cyan-500">Marketplace</h1>
 
       {loading ? (
         <div className="flex items-center justify-center h-[80vh]">

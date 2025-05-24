@@ -16,7 +16,7 @@ export default function Home() {
             <Image src="/ProClubs3.png" alt="Logo" width={100} height={100} className="rounded-full" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">ProClubs3</h1>
-          <p className="text-gray-400">Connect your wallet to start your career</p>
+          <p className="text-gray-400">Connect your wallet on Testnet to start your career</p>
         </div>
         
         {/* Container with sharp edges */}

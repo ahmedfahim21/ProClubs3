@@ -22,6 +22,7 @@ export interface FootballSimulatorRef {
   animateHomeGoal: () => Promise<void>;
   animateAwayGoal: () => Promise<void>;
   animateRandomEvent: () => Promise<void>;
+  stopAnimation: () => void;
 }
 
 const FootballSimulator = forwardRef<FootballSimulatorRef, FootballSimulatorProps>(({ onAnimationComplete }, ref) => {
@@ -29,17 +30,45 @@ const FootballSimulator = forwardRef<FootballSimulatorRef, FootballSimulatorProp
   const [ballPosition, setBallPosition] = useState({ x: 50, y: 50 });
   const [players, setPlayers] = useState<Player[]>([]);
   const animationRef = useRef<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
     animateHomeGoal: () => animateGoal('home'),
     animateAwayGoal: () => animateGoal('away'),
     animateRandomEvent,
+    stopAnimation: () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current);
+        animationRef.current = null;
+      }
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+      setIsAnimating(false);
+      setIsPlaying(false);
+    }
   }));
 
   // Initialize players with proper formations
   useEffect(() => {
     initializePlayers();
+  }, []);
+
+  // Initialize audio
+  useEffect(() => {
+    audioRef.current = new Audio('/crowd.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.3;
+
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
   }, []);
 
   const initializePlayers = () => {
@@ -73,7 +102,6 @@ const FootballSimulator = forwardRef<FootballSimulatorRef, FootballSimulatorProp
 
     setPlayers([...homeTeam, ...awayTeam]);
   };
-
 
   const animateBallMovement = (
     fromX: number, 
@@ -241,6 +269,10 @@ const FootballSimulator = forwardRef<FootballSimulatorRef, FootballSimulatorProp
     setIsAnimating(true);
     
     try {
+      if (audioRef.current && !isPlaying) {
+        audioRef.current.play();
+        setIsPlaying(true);
+      }
       
       // Phase 1: Build-up play (more realistic ball movement)
       const buildupX = team === 'home' ? 35 : 65;
@@ -367,94 +399,117 @@ const FootballSimulator = forwardRef<FootballSimulatorRef, FootballSimulatorProp
     }
   };
 
+  const toggleSound = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   return (
     <div className="">
-
-        {/* Football Pitch */}
-        <div className="relative bg-green-900 border-2 border-white border-opacity-30 rounded-xl mx-auto mb-6 shadow-2xl overflow-hidden" 
-             style={{ width: '900px', height: '500px', backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 40px)' }}>
-          
-          {/* Pitch markings */}
-          <div className="absolute inset-0">
-            {/* Center circle */}
-            <div className="absolute border border-white border-opacity-30 rounded-full"
-                 style={{ 
-                   left: '50%', 
-                   top: '50%', 
-                   width: '150px', 
-                   height: '150px',
-                   transform: 'translate(-50%, -50%)'
-                 }} />
-            
-            {/* Center line */}
-            <div className="absolute bg-white bg-opacity-30" 
-                 style={{ left: '50%', top: '0', width: '2px', height: '100%' }} />
-            
-            {/* Center spot */}
-            <div className="absolute bg-white rounded-full"
-                 style={{ left: '50%', top: '50%', width: '6px', height: '6px', transform: 'translate(-50%, -50%)' }} />
-            
-            {/* Goal areas */}
-            <div className="absolute border border-white border-opacity-30"
-                 style={{ left: '0', top: '40%', width: '80px', height: '20%' }} />
-            <div className="absolute border border-white border-opacity-30"
-                 style={{ right: '0', top: '40%', width: '80px', height: '20%' }} />
-            
-            {/* Penalty areas */}
-            <div className="absolute border border-white border-opacity-30"
-                 style={{ left: '0', top: '25%', width: '150px', height: '50%' }} />
-            <div className="absolute border border-white border-opacity-30"
-                 style={{ right: '0', top: '25%', width: '150px', height: '50%' }} />
-            
-            {/* Penalty spots */}
-            <div className="absolute bg-white rounded-full bg-opacity-80"
-                 style={{ left: '120px', top: '50%', width: '6px', height: '6px', transform: 'translate(-50%, -50%)' }} />
-            <div className="absolute bg-white rounded-full bg-opacity-80"
-                 style={{ right: '120px', top: '50%', width: '6px', height: '6px', transform: 'translate(-50%, -50%)' }} />
-            
-            {/* Goals */}
-            <div className="absolute bg-gray-900 border border-white border-opacity-50 shadow-lg"
-                 style={{ left: '-8px', top: '44%', width: '8px', height: '12%' }} />
-            <div className="absolute bg-gray-900 border border-white border-opacity-50 shadow-lg"
-                 style={{ right: '-8px', top: '44%', width: '8px', height: '12%' }} />
-            
-            {/* Subtle grass pattern overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-green-800 to-green-900 opacity-30 mix-blend-overlay"></div>
-          </div>
-
-          {/* Players */}
-          {players.map(player => (
-            <div
-              key={player.id}
-              className={`absolute w-7 h-7 rounded-full border-2 border-white border-opacity-70 transition-all duration-300 ease-out shadow-md ${
-                player.team === 'home' ? 'bg-gradient-to-b from-blue-600 to-blue-800' : 'bg-gradient-to-b from-red-600 to-red-800'
-              }`}
-              style={{
-                left: `${player.x}%`,
-                top: `${player.y}%`,
-                transform: 'translate(-50%, -50%)',
-                zIndex: 10
-              }}
-            >
-              <span className="text-xs text-white font-bold absolute inset-0 flex items-center justify-center drop-shadow">
-                {player.id}
-              </span>
-            </div>
-          ))}
-
-          {/* Ball */}
-          <div
-            className="absolute w-5 h-5 bg-white rounded-full border border-gray-400 transition-all duration-200 ease-out shadow-lg"
-            style={{
-              left: `${ballPosition.x}%`,
-              top: `${ballPosition.y}%`,
-              transform: 'translate(-50%, -50%)',
-              zIndex: 20,
-              boxShadow: '0 2px 4px rgba(0,0,0,0.4)'
-            }}
-          />
-        </div>
+      <div className="flex justify-center mb-4">
+        <button
+          onClick={toggleSound}
+          className={`px-4 py-2 rounded-sm font-semibold transition-colors ${
+            isPlaying 
+              ? 'bg-red-500/50 hover:bg-red-600/50 text-white' 
+              : 'bg-green-500/50 hover:bg-green-600/50 text-white'
+          }`}
+        >
+          {isPlaying ? 'Stop Sound' : 'Play Sound'}
+        </button>
       </div>
+
+      {/* Football Pitch */}
+      <div className="relative bg-green-900 border-2 border-white border-opacity-30 rounded-xl mx-auto mb-6 shadow-2xl overflow-hidden" 
+           style={{ width: '900px', height: '500px', backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 20px, rgba(255,255,255,0.03) 20px, rgba(255,255,255,0.03) 40px)' }}>
+        
+        {/* Pitch markings */}
+        <div className="absolute inset-0">
+          {/* Center circle */}
+          <div className="absolute border border-white border-opacity-30 rounded-full"
+               style={{ 
+                 left: '50%', 
+                 top: '50%', 
+                 width: '150px', 
+                 height: '150px',
+                 transform: 'translate(-50%, -50%)'
+               }} />
+          
+          {/* Center line */}
+          <div className="absolute bg-white bg-opacity-30" 
+               style={{ left: '50%', top: '0', width: '2px', height: '100%' }} />
+          
+          {/* Center spot */}
+          <div className="absolute bg-white rounded-full"
+               style={{ left: '50%', top: '50%', width: '6px', height: '6px', transform: 'translate(-50%, -50%)' }} />
+          
+          {/* Goal areas */}
+          <div className="absolute border border-white border-opacity-30"
+               style={{ left: '0', top: '40%', width: '80px', height: '20%' }} />
+          <div className="absolute border border-white border-opacity-30"
+               style={{ right: '0', top: '40%', width: '80px', height: '20%' }} />
+          
+          {/* Penalty areas */}
+          <div className="absolute border border-white border-opacity-30"
+               style={{ left: '0', top: '25%', width: '150px', height: '50%' }} />
+          <div className="absolute border border-white border-opacity-30"
+               style={{ right: '0', top: '25%', width: '150px', height: '50%' }} />
+          
+          {/* Penalty spots */}
+          <div className="absolute bg-white rounded-full bg-opacity-80"
+               style={{ left: '120px', top: '50%', width: '6px', height: '6px', transform: 'translate(-50%, -50%)' }} />
+          <div className="absolute bg-white rounded-full bg-opacity-80"
+               style={{ right: '120px', top: '50%', width: '6px', height: '6px', transform: 'translate(-50%, -50%)' }} />
+          
+          {/* Goals */}
+          <div className="absolute bg-gray-900 border border-white border-opacity-50 shadow-lg"
+               style={{ left: '-8px', top: '44%', width: '8px', height: '12%' }} />
+          <div className="absolute bg-gray-900 border border-white border-opacity-50 shadow-lg"
+               style={{ right: '-8px', top: '44%', width: '8px', height: '12%' }} />
+          
+          {/* Subtle grass pattern overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-green-800 to-green-900 opacity-30 mix-blend-overlay"></div>
+        </div>
+
+        {/* Players */}
+        {players.map(player => (
+          <div
+            key={player.id}
+            className={`absolute w-7 h-7 rounded-full border-2 border-white border-opacity-70 transition-all duration-300 ease-out shadow-md ${
+              player.team === 'home' ? 'bg-gradient-to-b from-blue-600 to-blue-800' : 'bg-gradient-to-b from-red-600 to-red-800'
+            }`}
+            style={{
+              left: `${player.x}%`,
+              top: `${player.y}%`,
+              transform: 'translate(-50%, -50%)',
+              zIndex: 10
+            }}
+          >
+            <span className="text-xs text-white font-bold absolute inset-0 flex items-center justify-center drop-shadow">
+              {player.id}
+            </span>
+          </div>
+        ))}
+
+        {/* Ball */}
+        <div
+          className="absolute w-5 h-5 bg-white rounded-full border border-gray-400 transition-all duration-200 ease-out shadow-lg"
+          style={{
+            left: `${ballPosition.x}%`,
+            top: `${ballPosition.y}%`,
+            transform: 'translate(-50%, -50%)',
+            zIndex: 20,
+            boxShadow: '0 2px 4px rgba(0,0,0,0.4)'
+          }}
+        />
+      </div>
+    </div>
   );
 });
 
