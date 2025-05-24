@@ -13,6 +13,7 @@ ProClubs3 is a decentralized football management game where users create clubs, 
 - Mint a **Club NFT** with a custom name, logo, and identity.
 - Auto-generate initial unique **Player NFTs** with stats, nationalities, positions, and AI-generated portraits.
 - Clubs and players are fully on-chain, tradable assets.
+- Clubs are stored in a ClubRegistry as dynamic fields, so that others can view them.
 
 ### ⚔️ Match Simulation
 - Users set tactics and challenge other clubs.
@@ -29,7 +30,7 @@ ProClubs3 is a decentralized football management game where users create clubs, 
 - No rigid league: flexible, asynchronous scheduling.
 
 ### 💰 In-Game Economy
-- **Internal tokens** track ticket sales, match rewards.
+- Internal token **PROCOIN** can track ticket sales, match rewards.
 - Can be evolved into a tokenized model later with DAO mechanics.
 
 ---
@@ -85,7 +86,7 @@ npm run dev
 
 - 🏆 League or tournament-based systems
 
-- 🎓 Player training & development modules
+- 🎓 Player training & development modules, injuries, ageing
 
 - 👥 Use AI Agent Tools like Talus for on-chain simulations
 
